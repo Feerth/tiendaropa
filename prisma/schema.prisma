@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum EstadoPedido {
+  PENDIENTE
+  CONFIRMADO
+  EN_PREPARACION
+  ENVIADO
+  ENTREGADO
+  CANCELADO
+}
+
+enum EstadoPago {
+  PENDIENTE
+  EN_REVISION
+  CONFIRMADO
+  RECHAZADO
+}
+
+model Producto {
+  id            String     @id @default(cuid())
+  nombre        String
+  slug          String     @unique
+  descripcion   String?
+  precio        Decimal    @db.Decimal(10, 2)
+  precioAntes   Decimal?   @db.Decimal(10, 2)
+  categoriaId   String
+  categoria     Categoria  @relation(fields: [categoriaId], references: [id])
+  variantes     Variante[]
+  imagenes      Imagen[]
+  destacado     Boolean    @default(false)
+  activo        Boolean    @default(true)
+  creadoEn      DateTime   @default(now())
+  actualizadoEn DateTime   @updatedAt
+
+  @@index([categoriaId])
+  @@index([activo, destacado])
+  @@index([slug])
+}
+
+model Imagen {
+  id         String   @id @default(cuid())
+  url        String
+  publicId   String
+  orden      Int      @default(0)
+  productoId String
+  producto   Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
+
+  @@index([productoId])
+}
+
+model Variante {
+  id            String       @id @default(cuid())
+  productoId    String
+  producto      Producto     @relation(fields: [productoId], references: [id], onDelete: Cascade)
+  talla         String
+  color         String?
+  stock         Int          @default(0)
+  sku           String?
+  itemsPedido   ItemPedido[]
+
+  @@unique([productoId, talla, color])
+  @@index([productoId])
+}
+
+model Categoria {
+  id        String     @id @default(cuid())
+  nombre    String     @unique
+  slug      String     @unique
+  imagenUrl String?
+  orden     Int        @default(0)
+  activa    Boolean    @default(true)
+  productos Producto[]
+
+  @@index([slug])
+}
+
+model Pedido {
+  id            String       @id @default(cuid())
+  numero        Int          @unique @default(autoincrement())
+  estado        EstadoPedido @default(PENDIENTE)
+  estadoPago    EstadoPago   @default(PENDIENTE)
+  nombreCliente String
+  telefono      String
+  email         String?
+  direccion     String?
+  items         ItemPedido[]
+  total         Decimal      @db.Decimal(10, 2)
+  notas         String?
+  notasAdmin    String?
+  comprobante   String?
+  creadoEn      DateTime     @default(now())
+  actualizadoEn DateTime     @updatedAt
+  confirmadoEn  DateTime?
+
+  @@index([estado, estadoPago])
+  @@index([creadoEn])
+}
+
+model ItemPedido {
+  id             String   @id @default(cuid())
+  pedidoId       String
+  pedido         Pedido   @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  varianteId     String
+  variante       Variante @relation(fields: [varianteId], references: [id])
+  cantidad       Int
+  precioUnit     Decimal  @db.Decimal(10, 2)
+  nombreProducto String
+  imagenUrl      String?
+  talla          String
+  color          String?
+  sku            String?
+
+  @@index([pedidoId])
+}
+
+model Configuracion {
+  id            String   @id @default(cuid())
+  clave         String   @unique
+  valor         String
+  descripcion   String?
+  actualizadoEn DateTime @updatedAt
+}
+
+model Admin {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String?
+  nombre        String?
+  creadoEn      DateTime  @default(now())
+  ultimoAcceso  DateTime?
+}
