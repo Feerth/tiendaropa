@@ -84,7 +84,21 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [destacados, nuevos, categorias, marcas] = await Promise.all([getDestacados(), getNuevos(), getCategorias(), getMarcas()]);
+  let destacados: Awaited<ReturnType<typeof getDestacados>> = [];
+  let nuevos: Awaited<ReturnType<typeof getNuevos>> = [];
+  let categorias: Awaited<ReturnType<typeof getCategorias>> = [];
+  let marcas: Awaited<ReturnType<typeof getMarcas>> = [];
+
+  try {
+    [destacados, nuevos, categorias, marcas] = await Promise.all([
+      getDestacados(),
+      getNuevos(),
+      getCategorias(),
+      getMarcas(),
+    ]);
+  } catch (e) {
+    console.error("Error loading home data:", e);
+  }
 
   return (
     <>
