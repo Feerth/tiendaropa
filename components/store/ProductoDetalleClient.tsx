@@ -78,7 +78,8 @@ export function ProductoDetalleClient({ productoId, nombre, imagen, precio, vari
   const handleWhatsAppConsult = () => {
     const talla = selectedTalla || (sinVariante ? "Única" : "");
     const color = selectedColor || "";
-    const msg = `¡Hola! Quiero consultar sobre: ${nombre}${color ? ` - Color: ${color}` : ""}${talla ? ` - Talla: ${talla}` : ""} (S/ ${Number.isFinite(precio) ? precio.toFixed(2) : "0.00"})`;
+    const link = typeof window !== "undefined" ? window.location.href : "";
+    const msg = `¡Hola! Quiero consultar sobre: ${nombre}${color ? ` - Color: ${color}` : ""}${talla ? ` - Talla: ${talla}` : ""} (S/ ${Number.isFinite(precio) ? precio.toFixed(2) : "0.00"})\n${link}`;
     const encoded = encodeURIComponent(msg);
     window.open(getWhatsAppUrl(WHATSAPP_NUMBER, encoded), "_blank");
   };
