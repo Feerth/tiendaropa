@@ -103,25 +103,36 @@ export default async function ProductosPage({ searchParams }: Props) {
   if (params.ordenar === "precio_desc") orderBy = { precio: "desc" };
   if (params.ordenar === "destacados") orderBy = { destacado: "desc" };
 
-  const [productos, total, categorias, marcas, tallas, colores] = await Promise.all([
-    prisma.producto.findMany({
-      where,
-      include: {
-        categoria: { select: { nombre: true, slug: true } },
-        marca: { select: { nombre: true, slug: true } },
-        variantes: { select: { talla: true, stock: true, color: true } },
-        imagenes: { select: { url: true, colorKey: true }, orderBy: { orden: "asc" } },
-      },
-      orderBy,
-      skip: (currentPage - 1) * limit,
-      take: limit,
-    }),
-    prisma.producto.count({ where }),
-    getCategorias(),
-    getMarcas(),
-    getTallas(),
-    getColores(),
-  ]);
+  let productos: any[] = [];
+  let total = 0;
+  let categorias: any[] = [];
+  let marcas: any[] = [];
+  let tallas: string[] = [];
+  let colores: string[] = [];
+
+  try {
+    [productos, total, categorias, marcas, tallas, colores] = await Promise.all([
+      prisma.producto.findMany({
+        where,
+        include: {
+          categoria: { select: { nombre: true, slug: true } },
+          marca: { select: { nombre: true, slug: true } },
+          variantes: { select: { talla: true, stock: true, color: true } },
+          imagenes: { select: { url: true, colorKey: true }, orderBy: { orden: "asc" } },
+        },
+        orderBy,
+        skip: (currentPage - 1) * limit,
+        take: limit,
+      }),
+      prisma.producto.count({ where }),
+      getCategorias(),
+      getMarcas(),
+      getTallas(),
+      getColores(),
+    ]);
+  } catch (e) {
+    console.error("Error loading productos data:", e);
+  }
 
   const productosData = productos.map((p) => ({
     ...p,
