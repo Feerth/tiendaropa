@@ -2,8 +2,8 @@
 
 ## Stock
 - El stock nunca baja de 0 (validación en backend con transacciones atómicas y frontend)
-- Si stock = 0: badge "SOLD OUT", botón de compra deshabilitado
-- Si stock > 0 y ≤ 5: badge "LAST UNITS" con pulso rojo animado
+- Si stock = 0: badge "AGOTADO", botón de compra deshabilitado
+- Si stock > 0 y ≤ 5: badge "ÚLTIMAS UNIDADES" con pulso rojo animado
 - Modificar stock requiere sesión admin activa
 - La reserva de stock se hace en `prisma.$transaction` con decrement y verificación de negativo
 - Si un pedido se cancela, el stock debe restaurarse (TODO)

@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NOVASK — Tienda Online de Zapatillas
 
-## Getting Started
+E-commerce de zapatillas con panel de administración, pagos por QR (Yape/Plin), tracking de pedidos, y gestión de inventario.
 
-First, run the development server:
+## Stack
+
+- **Frontend:** Next.js 16 (App Router) + TypeScript + Tailwind CSS v4
+- **Base de datos:** PostgreSQL (Supabase)
+- **ORM:** Prisma 7 con driver adapter (`@prisma/adapter-pg`)
+- **Auth:** NextAuth v5 (credentials, JWT 8h, solo admin)
+- **Imágenes:** Cloudinary (validación por magic bytes)
+- **Estado:** Zustand + localStorage (carrito)
+- **Validación:** Zod v4 (cliente + servidor)
+- **Deploy:** Vercel
+
+## Configuración
+
+### 1. Instalar dependencias
+
+```bash
+npm install
+```
+
+### 2. Configurar variables de entorno
+
+Copia `.env.example` a `.env` y completa con tus credenciales:
+
+```bash
+cp .env.example .env
+```
+
+Variables requeridas:
+- `DATABASE_URL` — Connection string de Supabase PostgreSQL
+- `NEXTAUTH_URL` — URL base (`http://localhost:3000` en dev)
+- `NEXTAUTH_SECRET` — Generar con: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
+- `NEXT_PUBLIC_WHATSAPP_NUMBER` — Número de WhatsApp (ej: `51931869696`)
+
+### 3. Configurar base de datos
+
+```bash
+npx prisma migrate dev
+```
+
+### 4. Crear admin inicial (seed)
+
+```bash
+npx tsx prisma/seed.ts
+```
+
+### 5. Iniciar servidor de desarrollo
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrir [http://localhost:3000](http://localhost:3000) para la tienda y [http://localhost:3000/admin](http://localhost:3000/admin) para el panel.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Estructura
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+app/
+├── (store)/          # Tienda pública (home, productos, checkout, etc.)
+├── (admin)/          # Panel de administración
+├── api/              # API Routes (públicas + admin)
+components/
+├── store/            # Componentes de la tienda
+├── admin/            # Componentes del admin
+├── shared/           # Componentes compartidos (Button, Badge, Input, etc.)
+lib/
+├── services/         # Lógica de negocio (producto, pedido, stock, pago, config)
+├── validations/      # Schemas Zod
+├── utils/            # Utilidades (formatPrice, slugify, etc.)
+stores/               # Zustand stores (carrito, toast)
+prisma/               # Schema + migraciones + seed
+types/                # TypeScript types compartidos
+```
 
-## Learn More
+## Deploy en Vercel
 
-To learn more about Next.js, take a look at the following resources:
+1. Importar repo desde GitHub en [vercel.com/new](https://vercel.com/new)
+2. Configurar variables de entorno en Vercel Dashboard (mismas que `.env`)
+3. Asegurar que `NEXTAUTH_URL` apunte a tu dominio de Vercel
+4. La primera vez, ejecutar las migraciones en Supabase y el seed manualmente
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Licencia
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Proyecto privado. Todos los derechos reservados.

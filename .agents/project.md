@@ -25,4 +25,4 @@
 - Productos agotados visibles pero no comprables (SEO + transparencia)
 - Carrito solo frontend (Zustand + localStorage), pedidos en DB
 - Edge Middleware (proxy.ts) para protección /admin
-- 8 modelos Prisma: Producto, Imagen, Variante, Categoria, Pedido, ItemPedido, Configuracion, Admin
+- 9 modelos Prisma: Producto, Imagen, Variante, Marca, Categoria, Pedido, ItemPedido, Configuracion, Admin
