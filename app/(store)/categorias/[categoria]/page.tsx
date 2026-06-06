@@ -6,7 +6,7 @@ import { prisma } from "@/lib/db";
 import { ProductGrid } from "@/components/store/ProductGrid";
 import { FiltersSidebar } from "@/components/store/FiltersSidebar";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 interface Props {
   params: Promise<{ categoria: string }>;

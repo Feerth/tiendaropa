@@ -81,7 +81,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const [destacados, nuevos, categorias, marcas] = await Promise.all([getDestacados(), getNuevos(), getCategorias(), getMarcas()]);
