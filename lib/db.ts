@@ -7,7 +7,8 @@ const pool = new pg.Pool({
   ssl: process.env.NODE_ENV === "production"
     ? { rejectUnauthorized: false }
     : false,
-  max: 5,
+  max: process.env.NODE_ENV === "production" ? 1 : 5,
+  connectionTimeoutMillis: 5000,
 });
 const adapter = new PrismaPg(pool);
 
