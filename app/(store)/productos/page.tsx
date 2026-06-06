@@ -138,7 +138,7 @@ export default async function ProductosPage({ searchParams }: Props) {
     ...p,
     precio: Number(p.precio),
     precioAntes: p.precioAntes ? Number(p.precioAntes) : null,
-    imagenes: p.imagenes.map((i) => ({ url: i.url, colorKey: i.colorKey })),
+    imagenes: (p.imagenes || []).map((i: any) => ({ url: i.url, colorKey: i.colorKey })),
   }));
 
   const totalPages = Math.ceil(total / limit);
