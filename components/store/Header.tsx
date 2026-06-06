@@ -201,7 +201,6 @@ export function StoreHeader() {
             </div>
           </div>
         </div>
-      </div>
     </>
   );
 }
