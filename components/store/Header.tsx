@@ -129,61 +129,77 @@ export function StoreHeader() {
         </div>
       </header>
 
-      {/* Mobile menu full-screen overlay */}
+      {/* Mobile menu overlay & sidebar */}
       {menuOpen && (
-        <div className="fixed inset-0 z-50 bg-bg-primary md:hidden flex flex-col animate-fadeIn">
-          <div className="flex items-center justify-between h-16 px-4 sm:px-6">
-            <Image
-              src="/logo/NOVASK_logo.png"
-              alt="NOVASK"
-              width={160}
-              height={160}
-              className="h-14 w-auto"
-            />
-            <button
-              onClick={() => setMenuOpen(false)}
-              className="p-2 text-text-secondary hover:text-accent-primary transition-colors"
-              aria-label="Cerrar menú"
-            >
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-          </div>
+        <div className="fixed inset-0 z-50 flex justify-end md:hidden">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            style={{ animation: "fadeInBlur 0.3s ease-out forwards" }}
+            onClick={() => setMenuOpen(false)}
+          />
 
-          <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-8">
-            <nav className="flex flex-col items-center space-y-6 w-full">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.key}
-                  href={link.href}
-                  onClick={() => setMenuOpen(false)}
-                  className={`text-4xl font-display tracking-widest uppercase transition-colors relative group ${
-                    isActive(pathname, currentSearch, link.href)
-                      ? "text-accent-primary"
-                      : link.isOferta
-                        ? "text-accent-secondary"
-                        : "text-text-primary"
-                  }`}
-                >
-                  {link.label}
-                  <span className="absolute -bottom-2 left-0 w-0 h-1 bg-accent-primary transition-all duration-300 group-hover:w-full"></span>
-                </Link>
-              ))}
-            </nav>
-          </div>
+          {/* Sidebar */}
+          <div
+            className="relative w-[85vw] max-w-sm h-full bg-bg-secondary border-l border-border-subtle shadow-2xl flex flex-col"
+            style={{ animation: "slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards" }}
+          >
+            <div className="flex items-center justify-between h-16 px-6 border-b border-border-subtle shrink-0">
+              <span className="font-display tracking-widest text-lg text-text-primary">MENÚ</span>
+              <button
+                onClick={() => setMenuOpen(false)}
+                className="p-2 -mr-2 text-text-secondary hover:text-accent-primary transition-colors"
+                aria-label="Cerrar menú"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
 
-          <div className="p-8 border-t border-border-subtle bg-bg-secondary/50">
-            <Link
-              href="/carrito"
-              onClick={() => setMenuOpen(false)}
-              className="flex items-center justify-center gap-4 text-xl text-text-primary hover:text-accent-primary transition-colors font-display tracking-wider uppercase"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="8" cy="21" r="1" /><circle cx="21" cy="21" r="1" /><path d="M1 1h4l2.68 13.39a1 1 0 0 0 1 .61h9.72a1 1 0 0 0 1-.79L23 6H6" />
-              </svg>
-              CARRITO {mounted && itemsCount > 0 ? <span className="text-accent-primary">({itemsCount})</span> : ""}
-            </Link>
+            <div className="flex-1 overflow-y-auto py-8 px-6">
+              <nav className="flex flex-col space-y-6">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.key}
+                    href={link.href}
+                    onClick={() => setMenuOpen(false)}
+                    className={`text-2xl font-display tracking-widest uppercase transition-all duration-200 flex items-center justify-between group ${
+                      isActive(pathname, currentSearch, link.href)
+                        ? "text-accent-primary"
+                        : link.isOferta
+                          ? "text-accent-secondary hover:text-accent-secondary/80"
+                          : "text-text-primary hover:text-accent-primary"
+                    }`}
+                  >
+                    {link.label}
+                    <svg className={`w-5 h-5 transition-transform duration-200 group-hover:translate-x-1 ${isActive(pathname, currentSearch, link.href) ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                ))}
+              </nav>
+            </div>
+
+            <div className="p-6 border-t border-border-subtle bg-bg-elevated shrink-0">
+              <Link
+                href="/carrito"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center justify-between p-4 rounded-xl bg-bg-card hover:bg-[#222] border border-border-subtle hover:border-accent-primary/50 transition-all group"
+              >
+                <div className="flex items-center gap-3">
+                  <svg className="text-text-secondary group-hover:text-accent-primary transition-colors" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="8" cy="21" r="1" /><circle cx="21" cy="21" r="1" /><path d="M1 1h4l2.68 13.39a1 1 0 0 0 1 .61h9.72a1 1 0 0 0 1-.79L23 6H6" />
+                  </svg>
+                  <span className="font-medium text-text-primary tracking-wide">CARRITO</span>
+                </div>
+                {mounted && itemsCount > 0 && (
+                  <span className="w-6 h-6 bg-accent-primary text-black text-xs font-bold rounded-full flex items-center justify-center">
+                    {itemsCount > 9 ? "9+" : itemsCount}
+                  </span>
+                )}
+              </Link>
+            </div>
           </div>
         </div>
       )}
