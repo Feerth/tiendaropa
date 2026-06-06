@@ -18,7 +18,7 @@ export function ToastContainer() {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`pointer-events-auto px-5 py-3 rounded-xl text-sm font-medium shadow-lg backdrop-blur-md animate-in slide-in-from-bottom-2 ${styles[toast.type]}`}
+          className={`pointer-events-auto px-5 py-3 rounded-xl text-sm font-medium shadow-lg backdrop-blur-md animate-fade-in ${styles[toast.type]}`}
           onClick={() => removeToast(toast.id)}
         >
           {toast.message}

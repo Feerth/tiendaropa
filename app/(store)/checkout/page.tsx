@@ -109,18 +109,22 @@ export default function CheckoutPage() {
       const result = await res.json();
 
       if (!result.success) {
-        if (result.code === "INSUFFICIENT_STOCK") {
+        if (result.code === "INSUFFICIENT_STOCK" && result.detalle) {
           setServerError(
-            `Stock insuficiente. Actualiza tu carrito e intenta de nuevo.`
+            `Stock insuficiente: "${result.detalle.nombre}" (disponible: ${result.detalle.stockDisponible}). Actualiza tu carrito.`
           );
+        } else if (result.code === "INSUFFICIENT_STOCK") {
+          setServerError("Stock insuficiente. Actualiza tu carrito e intenta de nuevo.");
+        } else if (result.code === "NOT_FOUND") {
+          setServerError("Algunos productos ya no están disponibles. Revisa tu carrito.");
         } else {
           setServerError(result.error || "Error al procesar el pedido");
         }
         return;
       }
 
-      clearCart();
       router.push(`/checkout/pago?numero=${result.data.numero}&id=${result.data.id}&total=${result.data.total}`);
+      setTimeout(() => clearCart(), 100);
     } catch {
       setServerError("Error de conexión. Intenta de nuevo.");
     } finally {
@@ -187,7 +191,7 @@ export default function CheckoutPage() {
                 value={form.notas}
                 onChange={(e) => handleChange("notas", e.target.value)}
                 rows={3}
-                className="w-full bg-bg-input border border-border-default rounded-lg px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary resize-none"
+                className="w-full bg-bg-elevated border border-border-default rounded-lg px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary resize-none"
                 placeholder="¿Alguna indicación especial?"
               />
             </div>

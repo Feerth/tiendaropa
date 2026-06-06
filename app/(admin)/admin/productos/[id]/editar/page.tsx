@@ -16,16 +16,20 @@ export default async function EditarProductoPage({ params }: Props) {
 
   if (!producto) notFound();
 
-  const categorias = await prisma.categoria.findMany({ orderBy: { orden: "asc" } });
+  const [categorias, marcas] = await Promise.all([
+    prisma.categoria.findMany({ orderBy: { orden: "asc" } }),
+    prisma.marca.findMany({ orderBy: { nombre: "asc" } }),
+  ]);
 
   const formData = {
     id: producto.id,
     nombre: producto.nombre,
     descripcion: producto.descripcion || "",
     precio: Number(producto.precio),
-    precioAntes: producto.precioAntes ? Number(producto.precioAntes) : undefined,
+    precioAntes: producto.precioAntes != null ? Number(producto.precioAntes) : undefined,
     categoriaId: producto.categoriaId,
-    imagenes: producto.imagenes.map((i) => i.url),
+    marcaId: producto.marcaId || undefined,
+    imagenes: producto.imagenes.map((i) => ({ url: i.url, colorKey: i.colorKey })),
     destacado: producto.destacado,
     activo: producto.activo,
     variantes: producto.variantes.map((v) => ({
@@ -39,7 +43,7 @@ export default async function EditarProductoPage({ params }: Props) {
   return (
     <div className="max-w-3xl">
       <h1 className="font-display text-4xl text-text-primary mb-8">Editar: {producto.nombre}</h1>
-      <ProductoForm categorias={categorias} initialData={formData} />
+      <ProductoForm categorias={categorias} marcas={marcas} initialData={formData} />
     </div>
   );
 }

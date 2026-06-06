@@ -1,13 +1,15 @@
 export function slugify(text: string): string {
-  return text
+  const slug = text
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
+  return slug || "producto";
 }
 
 export function formatPrice(price: number): string {
+  if (!Number.isFinite(price)) return "S/ 0.00";
   return new Intl.NumberFormat("es-PE", {
     style: "currency",
     currency: "PEN",
@@ -32,10 +34,14 @@ export function generateWhatsAppMessage(
   let message = "¡Hola! Quiero hacer el siguiente pedido:\n\n";
 
   items.forEach((item, i) => {
-    message += `${i + 1}. ${item.nombre} - Talla: ${item.talla} x${item.cantidad} = S/ ${(item.precio * item.cantidad).toFixed(2)}\n`;
+    const subtotal = Number.isFinite(item.precio)
+      ? (item.precio * item.cantidad).toFixed(2)
+      : "0.00";
+    message += `${i + 1}. ${item.nombre} - Talla: ${item.talla} x${item.cantidad} = S/ ${subtotal}\n`;
   });
 
-  message += `\nTotal: S/ ${total.toFixed(2)}`;
+  const totalStr = Number.isFinite(total) ? total.toFixed(2) : "0.00";
+  message += `\nTotal: S/ ${totalStr}`;
 
   if (nombreCliente) {
     message += `\nCliente: ${nombreCliente}`;
@@ -44,9 +50,7 @@ export function generateWhatsAppMessage(
   return encodeURIComponent(message);
 }
 
-export function getWhatsAppUrl(
-  phone: string,
-  message: string
-): string {
-  return `https://wa.me/${phone.replace(/[^0-9]/g, "")}?text=${message}`;
+export function getWhatsAppUrl(phone: string, message: string): string {
+  const cleaned = phone.replace(/[^0-9]/g, "");
+  return `https://wa.me/${cleaned}?text=${message}`;
 }

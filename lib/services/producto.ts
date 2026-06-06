@@ -1,32 +1,53 @@
-import type { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { slugify } from "@/lib/utils";
 import type { CreateProductoInput, UpdateProductoInput } from "@/lib/validations/producto";
 
+function toDecimal(num: number): Prisma.Decimal {
+  return new Prisma.Decimal(num.toFixed(2));
+}
+
 async function generarSlugUnico(nombre: string, idExcluir?: string): Promise<string> {
-  let slug = slugify(nombre);
-  if (!slug) slug = "producto-" + Date.now();
+  const base = slugify(nombre);
+  let slug = base;
 
   let counter = 1;
-  while (true) {
+  const MAX_ATTEMPTS = 100;
+
+  while (counter <= MAX_ATTEMPTS) {
     const existing = await prisma.producto.findUnique({ where: { slug } });
     if (!existing || (idExcluir && existing.id === idExcluir)) return slug;
-    slug = `${slugify(nombre)}-${counter++}`;
+    slug = `${base}-${counter++}`;
   }
+
+  return `${base}-${Date.now()}`;
 }
 
 function sanitizarVariante(v: { talla: string; color?: string; stock: number; sku?: string }) {
   return {
-    talla: v.talla,
-    color: v.color || undefined,
+    talla: v.talla.trim(),
+    color: (v.color || "").trim() || undefined,
     stock: v.stock,
-    sku: v.sku || undefined,
+    sku: v.sku?.trim() || undefined,
+  };
+}
+
+type ImagenInput = string | { url: string; colorKey?: string | null };
+function normalizarImagen(img: ImagenInput, i: number) {
+  const url = typeof img === "string" ? img : img.url;
+  const colorKey = typeof img === "string" ? null : (img.colorKey ?? null);
+  return {
+    url,
+    publicId: url.split("/").pop() || `img-${Date.now()}-${i}`,
+    orden: i,
+    colorKey: colorKey?.toLowerCase().trim() ?? null,
   };
 }
 
 export const ProductoService = {
   async listar(filtros?: {
     categoria?: string;
+    marca?: string;
     activo?: boolean;
     destacado?: boolean;
     buscar?: string;
@@ -44,10 +65,14 @@ export const ProductoService = {
     const where: Prisma.ProductoWhereInput = {};
 
     if (filtros?.activo !== undefined) where.activo = filtros.activo;
-    if (filtros?.destacado) where.destacado = true;
+    if (filtros?.destacado !== undefined) where.destacado = filtros.destacado;
 
     if (filtros?.categoria) {
       where.categoria = { slug: filtros.categoria };
+    }
+
+    if (filtros?.marca) {
+      where.marca = { slug: filtros.marca };
     }
 
     if (filtros?.buscar) {
@@ -58,10 +83,11 @@ export const ProductoService = {
       where.variantes = { some: { talla: filtros.talla } };
     }
 
-    if (filtros?.precioMin !== undefined || filtros?.precioMax !== undefined) {
-      where.precio = {};
-      if (filtros.precioMin !== undefined) where.precio.gte = filtros.precioMin;
-      if (filtros.precioMax !== undefined) where.precio.lte = filtros.precioMax;
+    if (filtros?.precioMin !== undefined && Number.isFinite(filtros.precioMin)) {
+      where.precio = { ...(where.precio as object || {}), gte: filtros.precioMin };
+    }
+    if (filtros?.precioMax !== undefined && Number.isFinite(filtros.precioMax)) {
+      where.precio = { ...(where.precio as object || {}), lte: filtros.precioMax };
     }
 
     let orderBy: Prisma.ProductoOrderByWithRelationInput = { creadoEn: "desc" };
@@ -74,8 +100,9 @@ export const ProductoService = {
         where,
         include: {
           categoria: { select: { nombre: true, slug: true } },
+          marca: { select: { nombre: true, slug: true } },
           variantes: { select: { talla: true, stock: true, color: true } },
-          imagenes: { select: { url: true }, orderBy: { orden: "asc" } },
+          imagenes: { select: { url: true, colorKey: true }, orderBy: { orden: "asc" } },
         },
         orderBy,
         skip,
@@ -88,7 +115,7 @@ export const ProductoService = {
       ...p,
       precio: Number(p.precio),
       precioAntes: p.precioAntes ? Number(p.precioAntes) : null,
-      imagenes: p.imagenes.map((i) => i.url),
+      imagenes: p.imagenes.map((i) => ({ url: i.url, colorKey: i.colorKey })),
     }));
 
     return {
@@ -104,6 +131,7 @@ export const ProductoService = {
       where: { slug },
       include: {
         categoria: true,
+        marca: true,
         variantes: {
           select: { id: true, talla: true, color: true, stock: true, sku: true },
         },
@@ -121,8 +149,9 @@ export const ProductoService = {
       },
       include: {
         categoria: { select: { nombre: true, slug: true } },
+        marca: { select: { nombre: true, slug: true } },
         variantes: { select: { talla: true, stock: true, color: true } },
-        imagenes: { select: { url: true }, orderBy: { orden: "asc" } },
+        imagenes: { select: { url: true, colorKey: true }, orderBy: { orden: "asc" } },
       },
       take: 4,
     });
@@ -131,13 +160,14 @@ export const ProductoService = {
       ...r,
       precio: Number(r.precio),
       precioAntes: r.precioAntes ? Number(r.precioAntes) : null,
-      imagenes: r.imagenes.map((i) => i.url),
+      imagenes: r.imagenes.map((i) => ({ url: i.url, colorKey: i.colorKey })),
     }));
 
     return {
       ...producto,
       precio: Number(producto.precio),
       precioAntes: producto.precioAntes ? Number(producto.precioAntes) : null,
+      imagenes: producto.imagenes.map((i) => ({ url: i.url, colorKey: i.colorKey })),
       relacionados: mappedRelacionados,
     };
   },
@@ -147,20 +177,17 @@ export const ProductoService = {
 
     const producto = await prisma.producto.create({
       data: {
-        nombre: data.nombre,
+        nombre: data.nombre.trim(),
         slug,
-        descripcion: data.descripcion,
-        precio: data.precio,
-        precioAntes: data.precioAntes,
+        descripcion: data.descripcion?.trim(),
+        precio: toDecimal(data.precio),
+        precioAntes: data.precioAntes != null ? toDecimal(data.precioAntes) : undefined,
         categoriaId: data.categoriaId,
+        marcaId: data.marcaId || undefined,
         destacado: data.destacado ?? false,
         activo: data.activo ?? true,
         imagenes: {
-          create: (data.imagenes ?? []).map((url, i) => ({
-            url,
-            publicId: url.split("/").pop() || `img-${Date.now()}-${i}`,
-            orden: i,
-          })),
+          create: (data.imagenes ?? []).map((img, i) => normalizarImagen(img, i)),
         },
         variantes: {
           create: data.variantes.map(sanitizarVariante),
@@ -186,29 +213,38 @@ export const ProductoService = {
     const updateData: Prisma.ProductoUpdateInput = {};
 
     if (data.nombre !== undefined) {
-      updateData.nombre = data.nombre;
+      updateData.nombre = data.nombre.trim();
       updateData.slug = await generarSlugUnico(data.nombre, id);
     }
-    if (data.descripcion !== undefined) updateData.descripcion = data.descripcion;
-    if (data.precio !== undefined) updateData.precio = data.precio;
-    if (data.precioAntes !== undefined) updateData.precioAntes = data.precioAntes;
-    if (data.categoriaId) updateData.categoria = { connect: { id: data.categoriaId } };
+    if (data.descripcion !== undefined) updateData.descripcion = data.descripcion?.trim() ?? null;
+    if (data.precio !== undefined) updateData.precio = toDecimal(data.precio);
+    if (data.precioAntes !== undefined) {
+      updateData.precioAntes = data.precioAntes != null ? toDecimal(data.precioAntes) : null;
+    }
+    if (data.categoriaId !== undefined) {
+      updateData.categoria = { connect: { id: data.categoriaId } };
+    }
+    if (data.marcaId !== undefined) {
+      updateData.marca = data.marcaId
+        ? { connect: { id: data.marcaId } }
+        : { disconnect: true };
+    }
     if (data.destacado !== undefined) updateData.destacado = data.destacado;
     if (data.activo !== undefined) updateData.activo = data.activo;
 
-    if (data.imagenes) {
-      await prisma.imagen.deleteMany({ where: { productoId: id } });
-      await prisma.imagen.createMany({
-        data: data.imagenes.map((url, i) => ({
-          url,
-          publicId: url.split("/").pop() || `img-${Date.now()}-${i}`,
-          orden: i,
-          productoId: id,
-        })),
-      });
+    if (data.imagenes !== undefined) {
+      await prisma.$transaction([
+        prisma.imagen.deleteMany({ where: { productoId: id } }),
+        prisma.imagen.createMany({
+          data: data.imagenes.map((img, i) => ({
+            ...normalizarImagen(img, i),
+            productoId: id,
+          })),
+        }),
+      ]);
     }
 
-    if (data.variantes) {
+    if (data.variantes !== undefined) {
       await prisma.$transaction([
         prisma.variante.deleteMany({ where: { productoId: id } }),
         prisma.variante.createMany({
@@ -220,18 +256,23 @@ export const ProductoService = {
       ]);
     }
 
-    const producto = await prisma.producto.update({
-      where: { id },
-      data: updateData,
-      include: { categoria: true, variantes: true, imagenes: { orderBy: { orden: "asc" } } },
-    });
+    if (Object.keys(updateData).length > 0) {
+      const producto = await prisma.producto.update({
+        where: { id },
+        data: updateData,
+        include: { categoria: true, marca: true, variantes: true, imagenes: { orderBy: { orden: "asc" } } },
+      });
+      return producto;
+    }
 
-    return producto;
+    return prisma.producto.findUnique({
+      where: { id },
+      include: { categoria: true, marca: true, variantes: true, imagenes: { orderBy: { orden: "asc" } } },
+    });
   },
 
   async eliminar(id: string) {
     try {
-      await prisma.variante.deleteMany({ where: { productoId: id } });
       await prisma.producto.delete({ where: { id } });
     } catch {
       throw new Error("No se pudo eliminar el producto. Puede tener pedidos asociados.");
@@ -255,6 +296,7 @@ export const ProductoService = {
         precio: original.precio,
         precioAntes: original.precioAntes,
         categoriaId: original.categoriaId,
+        marcaId: original.marcaId,
         destacado: false,
         activo: false,
         imagenes: {
@@ -262,6 +304,7 @@ export const ProductoService = {
             url: img.url,
             publicId: `${img.publicId}-COPY`,
             orden: img.orden,
+            colorKey: img.colorKey,
           })),
         },
         variantes: {

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { PedidoService } from "@/lib/services/pedido";
-import { pedidoUpdateSchema } from "@/lib/validations/producto";
+import { pedidoUpdateSchema } from "@/lib/validations/checkout.schema";
 import { auth } from "@/auth";
 
 export async function PATCH(

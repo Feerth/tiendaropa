@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
-import type { PedidoCreateInput, PedidoUpdateInput } from "@/lib/validations/producto";
+import type { PedidoCreateInput, PedidoUpdateInput } from "@/lib/validations/checkout.schema";
 
 export const PedidoService = {
   async listar(filtros?: { estado?: string }) {
@@ -165,7 +165,10 @@ export const PedidoService = {
     );
     hoy.setHours(0, 0, 0, 0);
 
-    const [totalProductos, productoSinStock, pedidosPendientes, pedidosHoy, ultimosPedidos, alertas] =
+    const manana = new Date(hoy);
+    manana.setDate(manana.getDate() + 1);
+
+    const [totalProductos, productoSinStock, pedidosPendientes, pedidosPagoPendiente, pedidosHoy, ventasHoy, ultimosPedidos, alertas] =
       await Promise.all([
         prisma.producto.count(),
         prisma.producto.count({
@@ -175,7 +178,17 @@ export const PedidoService = {
           where: { estado: "PENDIENTE" },
         }),
         prisma.pedido.count({
+          where: { estadoPago: "PENDIENTE" },
+        }),
+        prisma.pedido.count({
           where: { creadoEn: { gte: hoy } },
+        }),
+        prisma.pedido.aggregate({
+          _sum: { total: true },
+          where: {
+            creadoEn: { gte: hoy },
+            estadoPago: "CONFIRMADO",
+          },
         }),
         prisma.pedido.findMany({
           include: { items: true },
@@ -195,14 +208,17 @@ export const PedidoService = {
       totalProductos,
       productoSinStock,
       pedidosPendientes,
+      pedidosPagoPendiente,
       pedidosHoy,
+      ventasHoy: Number(ventasHoy._sum.total) || 0,
       ultimosPedidos: ultimosPedidos.map((p) => ({
         ...p,
         total: Number(p.total),
         itemsCount: p.items.length,
       })),
       alertasStock: alertas.map((a) => ({
-        nombre: a.producto.nombre + "|" + a.id,
+        nombre: a.producto.nombre,
+        productoId: a.id,
         variante: `${a.talla}${a.color ? ` - ${a.color}` : ""}`,
         stock: a.stock,
       })),

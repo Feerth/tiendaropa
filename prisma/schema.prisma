@@ -31,6 +31,8 @@ model Producto {
   precioAntes   Decimal?   @db.Decimal(10, 2)
   categoriaId   String
   categoria     Categoria  @relation(fields: [categoriaId], references: [id])
+  marcaId       String?
+  marca         Marca?     @relation(fields: [marcaId], references: [id])
   variantes     Variante[]
   imagenes      Imagen[]
   destacado     Boolean    @default(false)
@@ -39,6 +41,7 @@ model Producto {
   actualizadoEn DateTime   @updatedAt
 
   @@index([categoriaId])
+  @@index([marcaId])
   @@index([activo, destacado])
   @@index([slug])
 }
@@ -48,10 +51,12 @@ model Imagen {
   url        String
   publicId   String
   orden      Int      @default(0)
+  colorKey   String?
   productoId String
   producto   Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
 
   @@index([productoId])
+  @@index([productoId, colorKey])
 }
 
 model Variante {
@@ -66,6 +71,17 @@ model Variante {
 
   @@unique([productoId, talla, color])
   @@index([productoId])
+}
+
+model Marca {
+  id        String     @id @default(cuid())
+  nombre    String     @unique
+  slug      String     @unique
+  imagenUrl String?
+  activa    Boolean    @default(true)
+  productos Producto[]
+
+  @@index([slug])
 }
 
 model Categoria {

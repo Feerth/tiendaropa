@@ -1,4 +1,15 @@
+import type { Metadata } from "next";
 import { Button } from "@/components/shared/Button";
+
+export const metadata: Metadata = {
+  title: "Contacto — NOVASK",
+  description: "Contáctanos por WhatsApp. Consulta por productos, tallas, disponibilidad y más. Te atendemos al instante.",
+  openGraph: {
+    title: "Contacto — NOVASK",
+    description: "Contáctanos por WhatsApp.",
+    type: "website",
+  },
+};
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "51931869696";
 

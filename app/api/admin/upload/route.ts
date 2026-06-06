@@ -16,7 +16,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "No se recibió archivo", code: "NO_FILE" }, { status: 400 });
     }
 
-    const { url } = await uploadImage(file, "adnstore");
+    const { url } = await uploadImage(file);
 
     return NextResponse.json({ success: true, data: { url } });
   } catch (error) {

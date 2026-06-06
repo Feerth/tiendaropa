@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/shared/Button";
 import { useToastStore } from "@/stores/toast";
+import { formatPrice } from "@/lib/utils";
 
 interface PedidoData {
   id: string;
@@ -101,7 +102,7 @@ export function PaymentConfirmModal({ pedido, onClose }: Props) {
             <div className="flex justify-between text-sm">
               <span className="text-text-muted">Total</span>
               <span className="font-mono text-accent-primary font-bold">
-                S/ {pedido.total.toFixed(2)}
+                {formatPrice(pedido.total)}
               </span>
             </div>
           </div>
@@ -124,7 +125,7 @@ export function PaymentConfirmModal({ pedido, onClose }: Props) {
                   </p>
                 </div>
                 <span className="font-mono text-sm text-text-primary">
-                  S/ {(item.precioUnit * item.cantidad).toFixed(2)}
+                  {formatPrice(item.precioUnit * item.cantidad)}
                 </span>
               </div>
             ))}
@@ -143,7 +144,7 @@ export function PaymentConfirmModal({ pedido, onClose }: Props) {
               value={notas}
               onChange={(e) => setNotas(e.target.value)}
               rows={3}
-              className="w-full bg-bg-input border border-border-default rounded-lg px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary resize-none"
+              className="w-full bg-bg-elevated border border-border-default rounded-lg px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary resize-none"
               placeholder={pedido.estadoPago === "EN_REVISION" ? "Motivo si vas a rechazar..." : "Notas adicionales..."}
             />
           </div>

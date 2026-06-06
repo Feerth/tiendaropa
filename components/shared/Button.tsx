@@ -15,7 +15,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   primary:
     "bg-accent-primary text-black hover:brightness-110 active:brightness-90 font-semibold",
   secondary:
-    "bg-transparent border border-border-default text-text-primary hover:bg-bg-elevated hover:border-border-strong",
+    "bg-transparent border border-[#222] text-text-primary hover:bg-bg-elevated hover:border-[rgba(232,255,0,0.35)]",
   ghost:
     "bg-transparent text-text-secondary hover:text-text-primary hover:bg-bg-elevated",
   danger:

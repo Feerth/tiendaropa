@@ -46,10 +46,7 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
-    if (body.activo !== undefined) {
-      const producto = await ProductoService.toggleActivo(id, body.activo);
-      return NextResponse.json({ success: true, data: producto });
-    }
+    const { activo, ...rest } = body;
 
     const validation = updateProductoSchema.safeParse(body);
     if (!validation.success) {
@@ -57,6 +54,11 @@ export async function PATCH(
         { success: false, error: "Datos inválidos", code: "VALIDATION_ERROR" },
         { status: 400 }
       );
+    }
+
+    if (activo !== undefined && Object.keys(rest).length === 0) {
+      const producto = await ProductoService.toggleActivo(id, activo);
+      return NextResponse.json({ success: true, data: producto });
     }
 
     const producto = await ProductoService.actualizar(id, validation.data);

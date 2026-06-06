@@ -1,11 +1,20 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const ip = getClientIp(request);
+    const { allowed } = await checkRateLimit("notificar-pago", ip, 5, 10 * 60 * 1000);
+    if (!allowed) {
+      return NextResponse.json(
+        { success: false, error: "Demasiadas solicitudes. Intenta en unos minutos.", code: "RATE_LIMITED" },
+        { status: 429 }
+      );
+    }
     const { id } = await params;
 
     const pedido = await prisma.pedido.findUnique({ where: { id } });

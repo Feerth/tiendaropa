@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/shared/Button";
+import { formatPrice } from "@/lib/utils";
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "51931869696";
 
@@ -63,7 +64,7 @@ function PagoContent() {
     setNotified(true);
   };
 
-  const totalDisplay = parseFloat(total || "0").toFixed(2);
+  const totalNum = parseFloat(total || "0");
 
   return (
     <div className="max-w-lg mx-auto px-4 py-12 text-center">
@@ -115,7 +116,7 @@ function PagoContent() {
               Monto a pagar
             </p>
             <p className="font-mono text-4xl text-accent-primary font-bold">
-              S/ {totalDisplay}
+              {formatPrice(totalNum)}
             </p>
           </div>
 

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -24,6 +26,7 @@ export async function GET(request: Request) {
         where,
         include: {
           categoria: { select: { nombre: true, slug: true } },
+          marca: { select: { nombre: true, slug: true } },
           variantes: { select: { talla: true, stock: true, color: true } },
         },
         orderBy,

@@ -1,13 +1,19 @@
 import type { EstadoPedido, EstadoPago } from "@prisma/client";
 
+export type ImagenConColor = {
+  url: string;
+  colorKey: string | null;
+};
+
 export type ProductoListItem = {
   id: string;
   nombre: string;
   slug: string;
   precio: number;
   precioAntes: number | null;
-  imagenes: string[];
+  imagenes: ImagenConColor[];
   categoria: { nombre: string; slug: string };
+  marca: { nombre: string; slug: string } | null;
   variantes: { talla: string; stock: number; color: string | null }[];
   destacado: boolean;
   activo: boolean;
@@ -16,7 +22,6 @@ export type ProductoListItem = {
 
 export type ProductoDetalle = ProductoListItem & {
   descripcion: string | null;
-  imagenes: { id: string; url: string; publicId: string; orden: number }[];
   variantes: {
     id: string;
     talla: string;
@@ -25,6 +30,7 @@ export type ProductoDetalle = ProductoListItem & {
     sku: string | null;
   }[];
   categoria: { id: string; nombre: string; slug: string };
+  marca: { id: string; nombre: string; slug: string } | null;
   relacionados: ProductoListItem[];
 };
 
@@ -34,7 +40,8 @@ export type ProductoFormData = {
   precio: number;
   precioAntes?: number;
   categoriaId: string;
-  imagenes?: string[];
+  marcaId?: string;
+  imagenes?: { url: string; colorKey: string | null }[];
   destacado?: boolean;
   activo?: boolean;
   variantes: {
@@ -77,7 +84,7 @@ export type DashboardData = {
   pedidosHoy: number;
   ventasHoy: number;
   ultimosPedidos: PedidoListItem[];
-  alertasStock: { nombre: string; variante: string; stock: number }[];
+  alertasStock: { nombre: string; productoId: string; variante: string; stock: number }[];
 };
 
 export type ApiResponse<T = unknown> = {

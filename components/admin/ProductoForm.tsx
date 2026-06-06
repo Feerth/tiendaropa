@@ -1,29 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createProductoSchema, type CreateProductoInput } from "@/lib/validations/producto";
+import { colorToHex } from "@/lib/colors";
 import { Button } from "@/components/shared/Button";
 import { Input } from "@/components/shared/Input";
 import { ImageUploader } from "@/components/admin/ImageUploader";
+import { MatrixVariants, flattenMatrix, inflateToMatrix } from "@/components/admin/MatrixVariants";
+import type { ColorRow } from "@/components/admin/MatrixVariants";
 import { useToastStore } from "@/stores/toast";
-import type { Categoria } from "@prisma/client";
+import type { Categoria, Marca } from "@prisma/client";
+
+type ImagenField = { url: string; colorKey: string | null };
 
 interface Props {
   categorias: Categoria[];
-  initialData?: CreateProductoInput & { id?: string };
+  marcas?: Marca[];
+  initialData?: (CreateProductoInput & { id?: string });
 }
 
-export function ProductoForm({ categorias, initialData }: Props) {
+const DEFAULT_IMAGENES: ImagenField[] = [];
+
+export function ProductoForm({ categorias, marcas, initialData }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const addToast = useToastStore((s) => s.addToast);
 
+  const matrixInit = useMemo(() => {
+    if (initialData?.variantes?.length) {
+      return inflateToMatrix(initialData.variantes);
+    }
+    return { tallas: [] as string[], colorRows: [] as ColorRow[] };
+  }, []);
+
+  const [matrixTallas, setMatrixTallas] = useState<string[]>(matrixInit.tallas);
+  const [matrixColorRows, setMatrixColorRows] = useState<ColorRow[]>(matrixInit.colorRows);
+
   const {
     register,
-    control,
     handleSubmit,
     setValue,
     watch,
@@ -36,17 +53,44 @@ export function ProductoForm({ categorias, initialData }: Props) {
       precio: undefined,
       precioAntes: undefined,
       categoriaId: "",
-      imagenes: [],
+      marcaId: "",
+      imagenes: DEFAULT_IMAGENES,
       destacado: false,
       activo: true,
-      variantes: [{ talla: "", color: "", stock: 0, sku: "" }],
+      variantes: [],
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "variantes",
-  });
+  const coloresEnVariantes = useMemo(
+    () => matrixColorRows.map((r) => r.color),
+    [matrixColorRows]
+  );
+
+  const imagenes = watch("imagenes") as ImagenField[] | undefined;
+
+  const getImagenesPorColor = (colorKey: string | null): string[] => {
+    return (imagenes || [])
+      .filter((img) => img.colorKey === colorKey)
+      .map((img) => img.url);
+  };
+
+  const countImagenes = (colorKey: string | null): number => {
+    return getImagenesPorColor(colorKey).length;
+  };
+
+  const setImagenesPorColor = (colorKey: string | null, urls: string[]) => {
+    const other = (imagenes || []).filter((img) => img.colorKey !== colorKey);
+    const nuevas: ImagenField[] = [
+      ...other,
+      ...urls.map((url) => ({ url, colorKey })),
+    ];
+    setValue("imagenes", nuevas, { shouldValidate: true });
+  };
+
+  const handleMatrixChange = (tallas: string[], colorRows: ColorRow[]) => {
+    setMatrixTallas(tallas);
+    setMatrixColorRows(colorRows);
+  };
 
   const onSubmit = async (data: CreateProductoInput) => {
     setLoading(true);
@@ -78,8 +122,19 @@ export function ProductoForm({ categorias, initialData }: Props) {
     }
   };
 
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const variantes = flattenMatrix(matrixTallas, matrixColorRows);
+    if (variantes.length === 0) {
+      addToast("Agrega al menos una variante", "error");
+      return;
+    }
+    setValue("variantes", variantes);
+    await handleSubmit(onSubmit)(e);
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+    <form onSubmit={handleFormSubmit} className="space-y-8">
       {/* Información básica */}
       <div className="bg-bg-card border border-border-subtle rounded-xl p-6 space-y-4">
         <h2 className="font-display text-xl text-text-primary">Información básica</h2>
@@ -131,6 +186,19 @@ export function ProductoForm({ categorias, initialData }: Props) {
           )}
         </div>
 
+        <div>
+          <label className="block text-sm font-medium text-text-secondary mb-1.5">Marca</label>
+          <select
+            {...register("marcaId")}
+            className="w-full px-4 py-2.5 rounded-lg bg-bg-secondary border border-border-default text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/30 focus:border-accent-primary"
+          >
+            <option value="">Sin marca</option>
+            {(marcas || []).map((m) => (
+              <option key={m.id} value={m.id}>{m.nombre}</option>
+            ))}
+          </select>
+        </div>
+
         <div className="flex items-center gap-6">
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" {...register("destacado")} className="w-4 h-4 rounded border-border-default bg-bg-secondary accent-accent-primary" />
@@ -143,60 +211,58 @@ export function ProductoForm({ categorias, initialData }: Props) {
         </div>
       </div>
 
-      {/* Imágenes */}
-      <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
-        <ImageUploader
-          value={watch("imagenes") || []}
-          onChange={(urls) => setValue("imagenes", urls, { shouldValidate: true })}
-        />
+      {/* Imágenes por color */}
+      <div className="bg-bg-card border border-border-subtle rounded-xl p-6 space-y-6">
+        <h2 className="font-display text-xl text-text-primary">Imágenes</h2>
+
+        {/* General (sin color) */}
+        <div>
+          <h3 className="text-sm font-medium text-text-secondary mb-3 uppercase tracking-wider flex items-center gap-2">
+            <span>General</span>
+            {coloresEnVariantes.length > 0 && (
+              <span className="text-[10px] text-text-muted font-normal">(fallback si no hay del color)</span>
+            )}
+            <span className={`ml-auto text-[10px] px-2 py-0.5 rounded-full ${countImagenes(null) > 0 ? "bg-accent-primary/10 text-accent-primary" : "bg-accent-secondary/10 text-accent-secondary"}`}>
+              {countImagenes(null)}/4
+            </span>
+          </h3>
+          <ImageUploader
+            value={getImagenesPorColor(null)}
+            onChange={(urls) => setImagenesPorColor(null, urls)}
+            maxImages={4}
+          />
+        </div>
+
+        {/* Por color */}
+        {coloresEnVariantes.map((color) => (
+          <div key={color}>
+            <h3 className="text-sm font-medium text-accent-primary mb-3 uppercase tracking-wider flex items-center gap-2">
+              <span
+                className="w-3 h-3 rounded-full border border-border-default inline-block"
+                style={{ backgroundColor: colorToHex(color) }}
+              />
+              <span>Color: {color}</span>
+              <span className={`ml-auto text-[10px] px-2 py-0.5 rounded-full ${countImagenes(color) > 0 ? "bg-accent-primary/10 text-accent-primary" : "bg-accent-secondary/10 text-accent-secondary"}`}>
+                {countImagenes(color)}/4
+              </span>
+            </h3>
+            <ImageUploader
+              value={getImagenesPorColor(color)}
+              onChange={(urls) => setImagenesPorColor(color, urls)}
+              maxImages={4}
+            />
+          </div>
+        ))}
       </div>
 
-      {/* Variantes */}
-      <div className="bg-bg-card border border-border-subtle rounded-xl p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="font-display text-xl text-text-primary">Variantes</h2>
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={() => append({ talla: "", color: "", stock: 0, sku: "" })}
-          >
-            + AGREGAR
-          </Button>
-        </div>
-
-        <div className="space-y-3">
-          {fields.map((field, index) => (
-            <div key={field.id} className="grid grid-cols-5 gap-3 items-end">
-              <Input
-                label="Talla"
-                error={errors.variantes?.[index]?.talla?.message}
-                {...register(`variantes.${index}.talla`)}
-              />
-              <Input
-                label="Color"
-                {...register(`variantes.${index}.color`)}
-              />
-              <Input
-                label="Stock"
-                type="number"
-                error={errors.variantes?.[index]?.stock?.message}
-                {...register(`variantes.${index}.stock`, { valueAsNumber: true })}
-              />
-              <Input
-                label="SKU"
-                {...register(`variantes.${index}.sku`)}
-              />
-              <button
-                type="button"
-                onClick={() => remove(index)}
-                className="h-[42px] px-3 text-xs text-accent-secondary hover:text-accent-secondary/80 transition-colors"
-              >
-                Eliminar
-              </button>
-            </div>
-          ))}
-        </div>
+      {/* Variantes — Matriz */}
+      <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
+        <h2 className="font-display text-xl text-text-primary mb-6">Variantes</h2>
+        <MatrixVariants
+          initialTallas={matrixInit.tallas}
+          initialColorRows={matrixInit.colorRows}
+          onChange={handleMatrixChange}
+        />
       </div>
 
       {/* Acciones */}
@@ -211,3 +277,5 @@ export function ProductoForm({ categorias, initialData }: Props) {
     </form>
   );
 }
+
+

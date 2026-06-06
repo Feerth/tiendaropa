@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -11,6 +12,14 @@ interface Props {
 }
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "51931869696";
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { numero } = await params;
+  return {
+    title: `Pedido #${numero} — NOVASK`,
+    description: `Estado del pedido #${numero} en NOVASK. Consulta el estado de tu pedido de zapatillas.`,
+  };
+}
 
 export default async function PedidoStatusPage({ params }: Props) {
   const { numero } = await params;

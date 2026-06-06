@@ -2,15 +2,15 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Button } from "@/components/shared/Button";
 import { useToastStore } from "@/stores/toast";
 
 interface Props {
   value: string[];
   onChange: (urls: string[]) => void;
+  maxImages?: number;
 }
 
-export function ImageUploader({ value, onChange }: Props) {
+export function ImageUploader({ value, onChange, maxImages = 4 }: Props) {
   const [uploading, setUploading] = useState(false);
   const addToast = useToastStore((s) => s.addToast);
 
@@ -49,10 +49,6 @@ export function ImageUploader({ value, onChange }: Props) {
 
   return (
     <div className="space-y-3">
-      <label className="block text-sm font-medium text-text-secondary mb-1.5">
-        Imágenes ({value.length}/4)
-      </label>
-
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {value.map((url, index) => (
           <div
@@ -77,7 +73,7 @@ export function ImageUploader({ value, onChange }: Props) {
           </div>
         ))}
 
-        {value.length < 4 && (
+        {value.length < maxImages && (
           <label className="relative aspect-square rounded-lg border-2 border-dashed border-border-default hover:border-accent-primary hover:bg-bg-elevated transition-all cursor-pointer flex items-center justify-center bg-bg-secondary/50 group">
             {uploading ? (
               <span className="text-xs text-text-muted animate-pulse">Subiendo...</span>
@@ -97,10 +93,6 @@ export function ImageUploader({ value, onChange }: Props) {
           </label>
         )}
       </div>
-
-      <p className="text-[11px] text-text-muted">
-        PNG, JPG o WebP · Mínimo 500x500px · Max 4 imágenes
-      </p>
     </div>
   );
 }

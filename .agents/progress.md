@@ -81,10 +81,22 @@
 - [x] /pedido/[numero] con timeline de estados + estado de pago
 - [x] Flujo EstadoPago: PENDIENTE → EN_REVISION → CONFIRMADO/RECHAZADO
 
-## Pendiente (Fase 10)
+## Fase 10: Pre-Production Audit & Fixes ✅
+- [x] Auditoría completa pre-producción (20 ítems revisados)
+- [x] Creada página /categorias con grid de colecciones
+- [x] Creada ruta /categorias/[categoria] con filtros por categoría
+- [x] Logo NOVASK integrado en Header, Footer y móvil (reemplaza texto)
+- [x] "SOLD OUT" → "AGOTADO", "LAST UNITS" → "ÚLTIMAS UNIDADES"
+- [x] formatPrice() usado correctamente en /checkout/pago
+- [x] Metadata agregada a páginas faltantes (home, contacto, pedido)
+- [x] Admin dashboard: cards de pagos pendientes + ventas hoy
+- [x] Favicon configurado
+- [x] Build exitoso sin errores
+
+## Pendiente (Fase 11)
 - [ ] Deploy a Vercel
 - [ ] Microanimaciones adicionales
 - [ ] Pruebas de responsive
-- [ ] Empty states en admin (parcial)
+- [ ] Empty states en admin
 - [ ] Cart drawer para mobile
 - [ ] Testing (unitario + e2e)

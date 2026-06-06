@@ -2,14 +2,18 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
+import Image from "next/image";
+import { colorToHex } from "@/lib/colors";
 import type { Categoria } from "@prisma/client";
 
 interface FiltersSidebarProps {
   categorias: Categoria[];
+  marcas: { id: string; nombre: string; slug: string; imagenUrl: string | null }[];
   tallas: string[];
+  colores: string[];
 }
 
-export function FiltersSidebar({ categorias, tallas }: FiltersSidebarProps) {
+export function FiltersSidebar({ categorias, marcas, tallas, colores }: FiltersSidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -28,7 +32,9 @@ export function FiltersSidebar({ categorias, tallas }: FiltersSidebarProps) {
   );
 
   const categoriaActual = searchParams.get("categoria");
+  const marcaActual = searchParams.get("marca");
   const tallaActual = searchParams.get("talla");
+  const colorActual = searchParams.get("color");
 
   return (
     <div className="space-y-8">
@@ -63,6 +69,50 @@ export function FiltersSidebar({ categorias, tallas }: FiltersSidebarProps) {
         </ul>
       </div>
 
+      {/* Marcas */}
+      <div>
+        <h3 className="font-display text-lg text-text-primary mb-4">MARCAS</h3>
+        <ul className="space-y-2">
+          <li>
+            <button
+              onClick={() => router.push(`/productos?${createQuery("marca", null)}`)}
+              className={`text-sm transition-colors ${
+                !marcaActual ? "text-accent-primary font-medium" : "text-text-secondary hover:text-text-primary"
+              }`}
+            >
+              Todas
+            </button>
+          </li>
+          {marcas.map((m) => (
+            <li key={m.id}>
+              <button
+                onClick={() => router.push(`/productos?${createQuery("marca", m.slug)}`)}
+                className={`flex items-center gap-2 text-sm transition-colors w-full text-left ${
+                  marcaActual === m.slug
+                    ? "text-accent-primary font-medium"
+                    : "text-text-secondary hover:text-text-primary"
+                }`}
+              >
+                {m.imagenUrl ? (
+                  <Image
+                    src={m.imagenUrl}
+                    alt={m.nombre}
+                    width={20}
+                    height={20}
+                    className="w-5 h-5 rounded-full object-cover border border-border-subtle shrink-0"
+                  />
+                ) : (
+                  <span className="w-5 h-5 rounded-full bg-bg-card border border-border-subtle flex items-center justify-center text-[10px] font-bold text-text-muted shrink-0">
+                    {m.nombre[0]}
+                  </span>
+                )}
+                {m.nombre}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
       {/* Tallas */}
       <div>
         <h3 className="font-display text-lg text-text-primary mb-4">TALLAS</h3>
@@ -72,7 +122,7 @@ export function FiltersSidebar({ categorias, tallas }: FiltersSidebarProps) {
             className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${
               !tallaActual
                 ? "bg-accent-primary text-black border-accent-primary"
-                : "bg-transparent text-text-secondary border-border-default hover:border-border-strong"
+                : "bg-transparent text-text-secondary border-border-default hover:border-[rgba(232,255,0,0.35)]"
             }`}
           >
             Todas
@@ -84,7 +134,7 @@ export function FiltersSidebar({ categorias, tallas }: FiltersSidebarProps) {
               className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${
                 tallaActual === talla
                   ? "bg-accent-primary text-black border-accent-primary"
-                  : "bg-transparent text-text-secondary border-border-default hover:border-border-strong"
+                  : "bg-transparent text-text-secondary border-border-default hover:border-[rgba(232,255,0,0.35)]"
               }`}
             >
               {talla}
@@ -92,6 +142,46 @@ export function FiltersSidebar({ categorias, tallas }: FiltersSidebarProps) {
           ))}
         </div>
       </div>
+
+      {/* Colores */}
+      {colores.length > 0 && (
+        <div>
+          <h3 className="font-display text-lg text-text-primary mb-4">COLORES</h3>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => router.push(`/productos?${createQuery("color", null)}`)}
+              className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${
+                !colorActual
+                  ? "bg-accent-primary text-black border-accent-primary"
+                  : "bg-transparent text-text-secondary border-border-default hover:border-[rgba(232,255,0,0.35)]"
+              }`}
+            >
+              Todos
+            </button>
+            {colores.map((color) => {
+              const hex = colorToHex(color);
+              const isActive = colorActual === color;
+              return (
+                <button
+                  key={color}
+                  onClick={() => router.push(`/productos?${createQuery("color", color)}`)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md border transition-colors ${
+                    isActive
+                      ? "bg-accent-primary text-black border-accent-primary"
+                      : "bg-transparent text-text-secondary border-border-default hover:border-[rgba(232,255,0,0.35)]"
+                  }`}
+                >
+                  <span
+                    className="w-3 h-3 rounded-full border border-border-default inline-block shrink-0"
+                    style={{ backgroundColor: hex }}
+                  />
+                  {color}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Ordenar */}
       <div>

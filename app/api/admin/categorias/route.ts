@@ -37,6 +37,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, data: categoria }, { status: 201 });
   } catch (error) {
     console.error("Error en admin/categorias:", error);
+    if (error instanceof Error && "code" in error && (error as { code: string }).code === "P2002") {
+      return NextResponse.json(
+        { success: false, error: "Ya existe una categoría con ese nombre o slug", code: "DUPLICATE" },
+        { status: 409 }
+      );
+    }
     return NextResponse.json(
       { success: false, error: "Error al crear categoría", code: "CREATE_ERROR" },
       { status: 500 }

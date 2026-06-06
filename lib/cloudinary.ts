@@ -6,33 +6,35 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
-const MAGIC_BYTES: Record<string, number[]> = {
-  jpeg: [0xFF, 0xD8],
-  png: [0x89, 0x50],
-  webp: [0x52, 0x49, 0x46, 0x46],
-}
-
 const MAX_FILE_SIZE = 5 * 1024 * 1024
+
+const WEBP_HEADER = [0x52, 0x49, 0x46, 0x46]
+const WEBP_FOOTER = [0x57, 0x45, 0x42, 0x50]
 
 export async function validateImage(file: File): Promise<void> {
   if (file.size > MAX_FILE_SIZE) {
     throw new Error("La imagen no puede superar los 5MB")
   }
 
-  const buffer = new Uint8Array(await file.slice(0, 4).arrayBuffer())
+  const header = new Uint8Array(await file.slice(0, 4).arrayBuffer())
 
-  const isValid = Object.values(MAGIC_BYTES).some((bytes) =>
-    bytes.every((byte, i) => buffer[i] === byte)
-  )
+  const isJPEG = header[0] === 0xFF && header[1] === 0xD8
+  const isPNG = header[0] === 0x89 && header[1] === 0x50
+  const isRIFF = header.every((byte, i) => byte === WEBP_HEADER[i])
 
-  if (!isValid) {
-    throw new Error("Solo se permiten imágenes JPEG, PNG o WebP")
+  if (isJPEG || isPNG) return
+
+  if (isRIFF) {
+    const footer = new Uint8Array(await file.slice(8, 12).arrayBuffer())
+    if (footer.every((byte, i) => byte === WEBP_FOOTER[i])) return
   }
+
+  throw new Error("Solo se permiten imágenes JPEG, PNG o WebP")
 }
 
 export async function uploadImage(
   file: File,
-  folder = "tiendaropa"
+  folder = "novask"
 ): Promise<{ url: string; publicId: string }> {
   await validateImage(file)
 
@@ -65,7 +67,7 @@ export async function deleteImage(publicId: string): Promise<void> {
 
 export async function uploadBuffer(
   buffer: Buffer,
-  folder = "tiendaropa",
+  folder = "novask",
   publicId?: string
 ): Promise<{ url: string; publicId: string }> {
   return new Promise((resolve, reject) => {

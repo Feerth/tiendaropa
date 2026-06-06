@@ -1,43 +1,41 @@
 # Known Issues & Technical Debt
 
-## Issues conocidos
+## Issues conocidos (pre-producción audit — 20/6/2026 ✅)
 
-1. **Sin magic bytes validation** — El upload de imágenes solo verifica extensión, no contenido real (MIME spoofing posible). Pendiente implementar en lib/cloudinary.ts.
+### Resueltos en Fase 10
 
-2. **Sin flujo QR completo** — El carrito envía directo a WhatsApp. No hay página de checkout, pago QR, ni timeline de pedido. Pendiente implementar: /checkout, /checkout/pago, /pedido/[numero].
+- ~~SOLD OUT en inglés~~ → "AGOTADO" (ProductCard)
+- ~~LAST UNITS en inglés~~ → "ÚLTIMAS UNIDADES" (ProductCard)
+- ~~Footer /categorias roto~~ → Página /categorías creada con grid de colecciones
+- ~~Logo no usado~~ → Integrado en Header, Footer, y favicon
+- ~~formatPrice inconsistente en /checkout/pago~~ → Usa formatPrice() ahora
+- ~~Metadata faltante~~ → Agregada a home, contacto, pedido/[numero]
+- ~~Dashboard sin pagos pendientes/ventas hoy~~ → Cards agregadas
+- ~~Ruta categorias/[categoria] vacía~~ → Implementada con filtros
+- ~~Sin favicon~~ → Configurado en root layout
 
-3. **Admin sin página de configuración** — La tabla Configuracion existe en DB pero no hay UI para gestionar QR, WhatsApp number, nombre del negocio.
+### Pendientes
 
-4. **Sin confirmación de pago admin** — Los pedidos con estadoPago EN_REVISION no tienen modal de confirmación/rechazo.
-
-5. **AdminSidebar sin link a Configuración** — El sidebar tiene Dashboard, Productos, Inventario, Pedidos, Categorías pero falta Configuración.
-
-6. **Home no sigue diseño v3.0** — Hero es centrado simple, falta layout split, categorías sin imagen, faltan secciones editoriales (STYLE-STACK, Más Recomendados).
-
-7. **ProductCard sin botones duales** — Actualmente es un solo link, no tiene "AGREGAR" + "VER" al estilo Converse.
-
-8. **Sin vercel.json** — Los security headers CSP están parcialmente en next.config.ts pero falta configuración completa.
-
-9. **Sin empty states en admin** — Las tablas de productos, pedidos y categorías no muestran estado vacío informativo.
+1. **Sin sincronización de carrito con servidor** — Estado en localStorage no persiste entre dispositivos
+2. **Precios calculados en frontend** — El servidor recalcula al crear pedido, pero el carrito muestra precios locales
+3. **Sin testing automatizado** — No hay unit tests ni e2e
+4. **Cloudinary sin transformaciones** — Las imágenes no tienen sizes/quality optimizados
+5. **Empty states en admin** — Tablas sin datos muestran texto plano
+6. **Cart drawer mobile** — No hay slide-over panel para carrito en móvil
+7. **Paginación de admin** — Tablas largas no tienen paginación (productos, pedidos)
 
 ## TODOs técnicos
 
-- [ ] Implementar magic bytes validation en upload de imágenes
-- [ ] Crear página /checkout con formulario y validación Zod
-- [ ] Crear página /checkout/pago con QR dinámico
-- [ ] Crear página /pedido/[numero] con timeline de estados
-- [ ] Crear admin /configuracion con QR upload
-- [ ] Crear modal de confirmación de pago
-- [ ] Agregar link Configuración al AdminSidebar
-- [ ] Rediseñar home con las 6 secciones del v3.0
-- [ ] Rediseñar ProductCard con dos botones
-- [ ] Agregar vercel.json con CSP headers completos
-- [ ] Agregar empty states en admin tables
+- [ ] Agregar sincronización de carrito con API
+- [ ] Configurar Cloudinary transforms automáticos
+- [ ] Implementar tests unitarios con Vitest
+- [ ] Implementar tests e2e con Playwright
+- [ ] Agregar paginación en admin tables
+- [ ] Crear cart drawer responsive para mobile
 - [ ] Deploy a Vercel
 
 ## Deuda técnica
 
-- El estado de carrito usa localStorage (Zustand persist) — no hay sincronización con servidor
-- Los precios se calculan en frontend para el carrito, pero el servidor los recalcula al crear pedido
-- No hay testing automatizado (ni unit, ni e2e)
 - Las imágenes de Cloudinary no tienen transformaciones de tamaño configuradas
+- No hay testing automatizado (ni unit, ni e2e)
+- El estado de carrito usa localStorage (Zustand persist) — no hay sync con servidor

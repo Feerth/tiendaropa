@@ -14,7 +14,9 @@ export async function GET() {
     const productos = await prisma.producto.findMany({
       include: {
         categoria: { select: { nombre: true } },
+        marca: { select: { nombre: true } },
         variantes: { select: { stock: true } },
+        imagenes: { select: { url: true, colorKey: true }, orderBy: { orden: "asc" } },
       },
       orderBy: { creadoEn: "desc" },
     });

@@ -16,6 +16,10 @@ export function CategoriasManager({ categorias }: Props) {
   const [nombre, setNombre] = useState("");
   const [slug, setSlug] = useState("");
   const [loading, setLoading] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editNombre, setEditNombre] = useState("");
+  const [editSlug, setEditSlug] = useState("");
+  const [editLoading, setEditLoading] = useState(false);
   const addToast = useToastStore((s) => s.addToast);
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -64,6 +68,45 @@ export function CategoriasManager({ categorias }: Props) {
     }
   };
 
+  const startEdit = (cat: Categoria) => {
+    setEditingId(cat.id);
+    setEditNombre(cat.nombre);
+    setEditSlug(cat.slug);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditNombre("");
+    setEditSlug("");
+  };
+
+  const handleEdit = async (id: string) => {
+    if (!editNombre.trim()) return;
+
+    setEditLoading(true);
+    try {
+      const res = await fetch(`/api/admin/categorias/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre: editNombre.trim(), slug: editSlug.trim() || editNombre.toLowerCase().replace(/\s+/g, "-") }),
+      });
+
+      const result = await res.json();
+      if (!result.success) {
+        addToast(result.error, "error");
+        return;
+      }
+
+      addToast("Categoría actualizada", "success");
+      cancelEdit();
+      router.refresh();
+    } catch {
+      addToast("Error al actualizar categoría", "error");
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
   return (
     <div className="grid lg:grid-cols-2 gap-6">
       {/* Lista */}
@@ -71,18 +114,52 @@ export function CategoriasManager({ categorias }: Props) {
         <h2 className="font-display text-lg text-text-primary mb-4">Categorías existentes</h2>
         <div className="space-y-2">
           {categorias.map((cat, index) => (
-            <div key={cat.id} className="flex items-center justify-between py-2 px-3 rounded-lg bg-bg-secondary">
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-text-muted font-mono">{index + 1}</span>
-                <span className="text-sm text-text-primary">{cat.nombre}</span>
-                <span className="text-xs text-text-muted">/{cat.slug}</span>
-              </div>
-              <button
-                onClick={() => handleDelete(cat.id)}
-                className="text-xs text-text-muted hover:text-accent-secondary transition-colors"
-              >
-                Eliminar
-              </button>
+            <div key={cat.id} className="py-2 px-3 rounded-lg bg-bg-secondary">
+              {editingId === cat.id ? (
+                <div className="space-y-2">
+                  <Input
+                    label="Nombre"
+                    value={editNombre}
+                    onChange={(e) => setEditNombre(e.target.value)}
+                    required
+                  />
+                  <Input
+                    label="Slug"
+                    value={editSlug}
+                    onChange={(e) => setEditSlug(e.target.value)}
+                  />
+                  <div className="flex items-center gap-2 pt-1">
+                    <Button size="sm" loading={editLoading} onClick={() => handleEdit(cat.id)}>
+                      GUARDAR
+                    </Button>
+                    <Button size="sm" variant="secondary" onClick={cancelEdit}>
+                      CANCELAR
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-text-muted font-mono">{index + 1}</span>
+                    <span className="text-sm text-text-primary">{cat.nombre}</span>
+                    <span className="text-xs text-text-muted">/{cat.slug}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => startEdit(cat)}
+                      className="text-xs text-text-muted hover:text-accent-primary transition-colors"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => handleDelete(cat.id)}
+                      className="text-xs text-text-muted hover:text-accent-secondary transition-colors"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
           {categorias.length === 0 && (
@@ -99,7 +176,7 @@ export function CategoriasManager({ categorias }: Props) {
             label="Nombre"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
-            placeholder="Ej: Polos, Camisas..."
+            placeholder="Ej: Clásicas, Running..."
             required
           />
           <Input

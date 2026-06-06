@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { checkoutSchema } from "@/lib/validations/checkout.schema";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { sanitize } from "@/lib/sanitize";
 
 export async function POST(request: Request) {
   try {
@@ -41,6 +42,10 @@ export async function POST(request: Request) {
 
     const { nombreCliente, telefono, email, direccion, notas, items } = validation.data;
 
+    const nombreClienteSanitized = sanitize(nombreCliente);
+    const direccionSanitized = direccion ? sanitize(direccion) : undefined;
+    const notasSanitized = notas ? sanitize(notas) : undefined;
+
     const varianteIds = items.map((i) => i.varianteId);
     const variantes = await prisma.variante.findMany({
       where: { id: { in: varianteIds } },
@@ -68,8 +73,7 @@ export async function POST(request: Request) {
             success: false,
             error: `Stock insuficiente para ${v.producto.nombre} (Talla: ${v.talla})`,
             code: "INSUFFICIENT_STOCK",
-            varianteId: item.varianteId,
-            stockDisponible: v.stock,
+            detalle: { nombre: v.producto.nombre, talla: v.talla, stockDisponible: v.stock },
           },
           { status: 400 }
         );
@@ -98,11 +102,11 @@ export async function POST(request: Request) {
     const pedido = await prisma.$transaction(async (tx) => {
       const nuevo = await tx.pedido.create({
         data: {
-          nombreCliente,
+          nombreCliente: nombreClienteSanitized,
           telefono,
           email: email || null,
-          direccion: direccion || null,
-          notas: notas || null,
+          direccion: direccionSanitized || null,
+          notas: notasSanitized || null,
           total,
           items: { create: itemsConPrecio },
         },

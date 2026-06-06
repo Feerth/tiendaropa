@@ -10,6 +10,7 @@ async function getProductos() {
   const productos = await prisma.producto.findMany({
     include: {
       categoria: { select: { nombre: true } },
+      marca: { select: { nombre: true } },
       variantes: { select: { stock: true } },
       imagenes: { select: { url: true }, orderBy: { orden: "asc" } },
     },
@@ -46,6 +47,7 @@ export default async function AdminProductosPage() {
               <tr className="border-b border-border-subtle">
                 <th className="text-left p-4 text-text-muted font-medium uppercase tracking-wider text-xs">Producto</th>
                 <th className="text-left p-4 text-text-muted font-medium uppercase tracking-wider text-xs">Categoría</th>
+                <th className="text-left p-4 text-text-muted font-medium uppercase tracking-wider text-xs">Marca</th>
                 <th className="text-left p-4 text-text-muted font-medium uppercase tracking-wider text-xs">Precio</th>
                 <th className="text-left p-4 text-text-muted font-medium uppercase tracking-wider text-xs">Stock</th>
                 <th className="text-left p-4 text-text-muted font-medium uppercase tracking-wider text-xs">Estado</th>
@@ -70,6 +72,7 @@ export default async function AdminProductosPage() {
                     </div>
                   </td>
                   <td className="p-4 text-text-secondary">{producto.categoria.nombre}</td>
+                  <td className="p-4 text-text-secondary">{producto.marca?.nombre || "—"}</td>
                   <td className="p-4 font-mono text-text-primary">{formatPrice(producto.precio)}</td>
                   <td className="p-4">
                     <span className={`font-mono text-sm ${producto.stockTotal === 0 ? "text-accent-secondary" : "text-text-primary"}`}>

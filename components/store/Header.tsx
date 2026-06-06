@@ -1,16 +1,51 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useCartStore } from "@/stores/cart";
+
+function useScrollState() {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return scrolled;
+}
+
+const navLinks = [
+  { key: "productos", href: "/productos", label: "PRODUCTOS" },
+  { key: "ofertas", href: "/productos?enOferta=true", label: "OFERTAS", isOferta: true },
+  { key: "novedades", href: "/productos?ordenar=nuevos", label: "NOVEDADES" },
+];
+
+function isActive(pathname: string, currentSearch: string, href: string) {
+  const [hrefPath, hrefQuery] = href.split("?");
+  if (pathname !== hrefPath) return false;
+  if (!hrefQuery) return true;
+  const currentParams = new URLSearchParams(currentSearch);
+  const hrefParams = new URLSearchParams(hrefQuery);
+  for (const [key, value] of hrefParams) {
+    if (currentParams.get(key) !== value) return false;
+  }
+  return true;
+}
 
 export function StoreHeader() {
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [currentSearch, setCurrentSearch] = useState("");
+  const pathname = usePathname();
+  const scrolled = useScrollState();
   const itemsCount = useCartStore((s) => s.items.reduce((sum, i) => sum + i.cantidad, 0));
 
   useEffect(() => {
     setMounted(true);
+    setCurrentSearch(window.location.search);
   }, []);
 
   useEffect(() => {
@@ -23,41 +58,42 @@ export function StoreHeader() {
   }, [menuOpen]);
 
   return (
-    <header className="sticky top-0 z-40 bg-bg-primary/90 backdrop-blur-md border-b border-border-subtle">
+    <header className={`sticky top-0 z-40 bg-bg-primary/90 backdrop-blur-md transition-all duration-300 ${scrolled ? "border-b border-border-subtle" : ""}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link
             href="/"
-            className="font-display text-2xl tracking-wider text-accent-primary hover:text-accent-primary/80 transition-colors"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
-            ADNSTORE
+            <Image
+              src="/logo/NOVASK_logo.png"
+              alt="NOVASK"
+              width={160}
+              height={160}
+              className="h-14 w-auto"
+              priority
+            />
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
-            <Link
-              href="/productos"
-              className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
-            >
-              Productos
-            </Link>
-            <Link
-              href="/productos?categoria=ropa"
-              className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
-            >
-              Ropa
-            </Link>
-            <Link
-              href="/productos?categoria=zapatillas"
-              className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
-            >
-              Zapatillas
-            </Link>
-            <Link
-              href="/productos?categoria=ofertas"
-              className="text-sm font-medium text-accent-secondary hover:text-accent-secondary/80 transition-colors"
-            >
-              Ofertas
-            </Link>
+            {navLinks.map((link) => (
+              <Link
+                key={link.key}
+                href={link.href}
+                className={`relative text-sm font-medium uppercase tracking-[0.05em] transition-colors ${
+                  isActive(pathname, currentSearch, link.href)
+                    ? "text-accent-primary"
+                    : link.isOferta
+                      ? "text-accent-secondary hover:text-accent-secondary/80"
+                      : "text-text-secondary hover:text-text-primary"
+                }`}
+              >
+                {link.label}
+                {isActive(pathname, currentSearch, link.href) && (
+                  <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-accent-primary rounded-full" />
+                )}
+              </Link>
+            ))}
           </nav>
 
           <div className="flex items-center gap-4">
@@ -66,7 +102,7 @@ export function StoreHeader() {
               className="relative p-2 text-text-secondary hover:text-text-primary transition-colors"
               aria-label="Carrito de compras"
             >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="8" cy="21" r="1" />
                 <circle cx="21" cy="21" r="1" />
                 <path d="M1 1h4l2.68 13.39a1 1 0 0 0 1 .61h9.72a1 1 0 0 0 1-.79L23 6H6" />
@@ -98,11 +134,17 @@ export function StoreHeader() {
           onClick={() => setMenuOpen(false)}
         >
           <div
-            className="absolute right-0 top-0 h-full w-72 max-w-[85vw] bg-bg-primary border-l border-border-subtle shadow-2xl"
+            className="absolute left-0 top-0 h-full w-72 max-w-[85vw] bg-bg-elevated shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between h-16 px-6 border-b border-border-subtle">
-              <span className="font-display text-lg text-accent-primary">ADNSTORE</span>
+              <Image
+                src="/logo/NOVASK_logo.png"
+                alt="NOVASK"
+                width={120}
+                height={120}
+                className="h-12 w-auto"
+              />
               <button
                 onClick={() => setMenuOpen(false)}
                 className="p-2 text-text-secondary hover:text-text-primary"
@@ -120,35 +162,21 @@ export function StoreHeader() {
                 onClick={() => setMenuOpen(false)}
                 className="block text-lg text-text-primary hover:text-accent-primary transition-colors font-display tracking-wider"
               >
-                TODOS LOS PRODUCTOS
+                PRODUCTOS
               </Link>
               <Link
-                href="/productos?categoria=ropa"
-                onClick={() => setMenuOpen(false)}
-                className="block text-lg text-text-secondary hover:text-accent-primary transition-colors font-display tracking-wider"
-              >
-                ROPA
-              </Link>
-              <Link
-                href="/productos?categoria=zapatillas"
-                onClick={() => setMenuOpen(false)}
-                className="block text-lg text-text-secondary hover:text-accent-primary transition-colors font-display tracking-wider"
-              >
-                ZAPATILLAS
-              </Link>
-              <Link
-                href="/productos?categoria=accesorios"
-                onClick={() => setMenuOpen(false)}
-                className="block text-lg text-text-secondary hover:text-accent-primary transition-colors font-display tracking-wider"
-              >
-                ACCESORIOS
-              </Link>
-              <Link
-                href="/productos?categoria=ofertas"
+                href="/productos?enOferta=true"
                 onClick={() => setMenuOpen(false)}
                 className="block text-lg text-accent-secondary hover:text-accent-secondary/80 transition-colors font-display tracking-wider"
               >
                 OFERTAS
+              </Link>
+              <Link
+                href="/productos?ordenar=nuevos"
+                onClick={() => setMenuOpen(false)}
+                className="block text-lg text-text-secondary hover:text-accent-primary transition-colors font-display tracking-wider"
+              >
+                NOVEDADES
               </Link>
             </nav>
 

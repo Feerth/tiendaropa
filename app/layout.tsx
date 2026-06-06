@@ -3,8 +3,12 @@ import "./globals.css";
 import { ToastContainer } from "@/components/shared/Toast";
 
 export const metadata: Metadata = {
-  title: "ADNSTORE — Ropa y Zapatillas",
-  description: "Tienda online de ropa y zapatillas. Estilo urbano con las mejores marcas.",
+  title: "NOVASK — Zapatillas",
+  description: "Tienda online de zapatillas. Estilo urbano con las mejores marcas.",
+  icons: {
+    icon: "/logo/NOVASK_logo.png",
+    apple: "/logo/NOVASK_logo.png",
+  },
 };
 
 export default function RootLayout({

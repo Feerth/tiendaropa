@@ -1,25 +1,53 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { ProductGrid } from "@/components/store/ProductGrid";
 import { HeroSection } from "@/components/store/HeroSection";
 import { CategoryGrid } from "@/components/store/CategoryGrid";
+import { BrandBar } from "@/components/store/BrandBar";
+
+async function getCategorias() {
+  return prisma.categoria.findMany({ orderBy: { orden: "asc" } });
+}
+
+async function getMarcas() {
+  return prisma.marca.findMany({ where: { activa: true }, orderBy: { nombre: "asc" } });
+}
 
 async function getDestacados() {
-  const productos = await prisma.producto.findMany({
+  let productos = await prisma.producto.findMany({
     where: { activo: true, destacado: true },
     include: {
       categoria: { select: { nombre: true, slug: true } },
+      marca: { select: { nombre: true, slug: true } },
       variantes: { select: { id: true, talla: true, stock: true, color: true } },
-      imagenes: { select: { url: true }, orderBy: { orden: "asc" } },
+      imagenes: { select: { url: true, colorKey: true }, orderBy: { orden: "asc" } },
     },
     take: 6,
     orderBy: { creadoEn: "desc" },
   });
+
+  if (productos.length < 4) {
+    const ids = productos.map((p) => p.id);
+    const fill = await prisma.producto.findMany({
+      where: { activo: true, id: { notIn: ids } },
+      include: {
+        categoria: { select: { nombre: true, slug: true } },
+        marca: { select: { nombre: true, slug: true } },
+        variantes: { select: { id: true, talla: true, stock: true, color: true } },
+        imagenes: { select: { url: true, colorKey: true }, orderBy: { orden: "asc" } },
+      },
+      take: 4 - productos.length,
+      orderBy: { creadoEn: "desc" },
+    });
+    productos = [...productos, ...fill];
+  }
+
   return productos.map((p) => ({
     ...p,
     precio: Number(p.precio),
     precioAntes: p.precioAntes ? Number(p.precioAntes) : null,
-    imagenes: p.imagenes.map((i) => i.url),
+    imagenes: p.imagenes.map((i) => ({ url: i.url, colorKey: i.colorKey })),
   }));
 }
 
@@ -28,8 +56,9 @@ async function getNuevos() {
     where: { activo: true },
     include: {
       categoria: { select: { nombre: true, slug: true } },
+      marca: { select: { nombre: true, slug: true } },
       variantes: { select: { id: true, talla: true, stock: true, color: true } },
-      imagenes: { select: { url: true }, orderBy: { orden: "asc" } },
+      imagenes: { select: { url: true, colorKey: true }, orderBy: { orden: "asc" } },
     },
     take: 8,
     orderBy: { creadoEn: "desc" },
@@ -38,14 +67,24 @@ async function getNuevos() {
     ...p,
     precio: Number(p.precio),
     precioAntes: p.precioAntes ? Number(p.precioAntes) : null,
-    imagenes: p.imagenes.map((i) => i.url),
+    imagenes: p.imagenes.map((i) => ({ url: i.url, colorKey: i.colorKey })),
   }));
 }
+
+export const metadata: Metadata = {
+  title: "NOVASK — Zapatillas Originales",
+  description: "Tienda online de zapatillas originales. Estilo urbano con las mejores marcas. Envíos a todo Perú.",
+  openGraph: {
+    title: "NOVASK — Zapatillas Originales",
+    description: "Tienda online de zapatillas originales. Envíos a todo Perú.",
+    type: "website",
+  },
+};
 
 export const revalidate = 3600;
 
 export default async function HomePage() {
-  const [destacados, nuevos] = await Promise.all([getDestacados(), getNuevos()]);
+  const [destacados, nuevos, categorias, marcas] = await Promise.all([getDestacados(), getNuevos(), getCategorias(), getMarcas()]);
 
   return (
     <>
@@ -53,7 +92,10 @@ export default async function HomePage() {
       <HeroSection />
 
       {/* ─── CATEGORY GRID ─── */}
-      <CategoryGrid />
+      <CategoryGrid categorias={categorias} />
+
+      {/* ─── MARCAS ─── */}
+      <BrandBar marcas={marcas} />
 
       {/* ─── NUEVOS DROPS ─── */}
       <section className="py-16 md:py-20 px-4 max-w-7xl mx-auto">
@@ -123,15 +165,15 @@ export default async function HomePage() {
             <Link
               key={producto.id}
               href={`/productos/${producto.slug}`}
-              className={`group relative rounded-2xl overflow-hidden bg-bg-card border border-border-subtle hover:border-accent-primary/30 transition-all duration-500 hover:-translate-y-1 ${
+              className={`group relative rounded-2xl overflow-hidden bg-bg-card border border-[#222] transition-all duration-[250ms] ease-in-out hover:-translate-y-1 hover:border-[rgba(232,255,0,0.35)] ${
                 index === 0 ? "col-span-2 row-span-2 aspect-square" : "aspect-square"
               }`}
             >
               {producto.imagenes[0] ? (
                 <img
-                  src={producto.imagenes[0]}
+                  src={producto.imagenes[0].url}
                   alt={producto.nombre}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-full object-cover transition-transform duration-[350ms] ease-in-out group-hover:scale-[1.04]"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-text-muted font-display text-3xl">
@@ -146,7 +188,7 @@ export default async function HomePage() {
                 <h3 className="font-display text-lg md:text-2xl text-white mt-1">
                   {producto.nombre}
                 </h3>
-                <span className="text-xs text-white/70 hover:text-accent-primary transition-colors inline-flex items-center gap-1 mt-1">
+                <span className="text-xs text-white/70 hover:text-[#E8FF00] transition-colors duration-200 inline-flex items-center gap-1 mt-1">
                   Ver todo →
                 </span>
               </div>

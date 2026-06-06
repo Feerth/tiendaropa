@@ -1,5 +1,5 @@
 # TiendaRopa — E-commerce de Ropa y Zapatillas (Dark Editorial Bold)
-**Nombre del negocio:** ADNSTORE (configurable desde admin)
+**Nombre del negocio:** NOVASK (configurable desde admin)
 
 ## Stack
 - **Frontend:** Next.js 16 (App Router) + TypeScript strict

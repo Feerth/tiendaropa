@@ -46,7 +46,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-bg-primary px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="font-display text-4xl text-accent-primary mb-2">ADNSTORE</h1>
+          <h1 className="font-display text-4xl text-accent-primary mb-2">NOVASK</h1>
           <p className="text-text-secondary text-sm">Panel de administración</p>
         </div>
 

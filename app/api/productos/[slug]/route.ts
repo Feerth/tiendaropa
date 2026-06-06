@@ -12,6 +12,7 @@ export async function GET(
       where: { slug, activo: true },
       include: {
         categoria: true,
+        marca: true,
         variantes: {
           select: { id: true, talla: true, color: true, stock: true, sku: true },
         },
@@ -33,6 +34,7 @@ export async function GET(
       },
       include: {
         categoria: { select: { nombre: true, slug: true } },
+        marca: { select: { nombre: true, slug: true } },
         variantes: { select: { talla: true, stock: true, color: true } },
       },
       take: 4,

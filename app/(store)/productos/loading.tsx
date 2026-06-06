@@ -10,7 +10,7 @@ export default function ProductosLoading() {
         </div>
         <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="aspect-[3/4] bg-bg-elevated rounded-xl" />
+            <div key={i} className="aspect-square bg-bg-elevated rounded-xl" />
           ))}
         </div>
       </div>

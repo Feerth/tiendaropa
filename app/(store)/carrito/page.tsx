@@ -62,7 +62,7 @@ export default function CarritoPage() {
                 <Image src={item.imagen} alt={item.nombre} fill className="object-cover" sizes="100px" />
               ) : (
                 <div className="flex items-center justify-center h-full text-text-muted font-display text-lg">
-                  ADNSTORE
+                  NOVASK
                 </div>
               )}
             </div>
@@ -139,18 +139,19 @@ export default function CarritoPage() {
             <p className="text-xs text-accent-tertiary text-center">
               ✅ Pedido enviado a WhatsApp
             </p>
-            <button
-              onClick={handleClearCart}
-              className="text-xs text-text-muted hover:text-text-secondary underline block mx-auto"
-            >
-              Vaciar carrito
-            </button>
           </div>
         )}
 
         <p className="text-xs text-text-muted text-center mt-3">
           Recibirás un resumen detallado de tu pedido en WhatsApp.
         </p>
+
+        <button
+          onClick={() => { if (confirm("¿Vaciar el carrito?")) { clearCart(); setCheckoutDone(false); } }}
+          className="text-xs text-text-muted hover:text-accent-secondary underline block mx-auto mt-2"
+        >
+          Vaciar carrito
+        </button>
       </div>
     </div>
   );

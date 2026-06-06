@@ -20,7 +20,10 @@ export default function ConfiguracionPage() {
     fetch("/api/admin/configuracion")
       .then((r) => r.json())
       .then((res) => {
-        if (res.success) setConfig(res.data);
+        if (res.success && res.data) setConfig(res.data);
+      })
+      .catch(() => {
+        addToast("Error al cargar configuración", "error");
       })
       .finally(() => setLoading(false));
   }, []);
@@ -164,7 +167,7 @@ export default function ConfiguracionPage() {
           onChange={(e) =>
             setConfig((prev) => ({ ...prev, nombre_negocio: e.target.value }))
           }
-          placeholder="ADNSTORE"
+          placeholder="NOVASK"
         />
       </section>
 
