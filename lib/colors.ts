@@ -62,9 +62,14 @@ export function getImagenPorColor(imagenes: ImagenColor[], colorKey: string | nu
 export function getImagenesFiltradas(imagenes: ImagenColor[], colorKey: string | null): ImagenColor[] {
   const key = normalizeColorKey(colorKey);
   if (!key) return imagenes;
+  
   const delColor = imagenes.filter((i) => normalizeColorKey(i.colorKey) === key);
   if (delColor.length > 0) return delColor;
-  return imagenes.filter((i) => !i.colorKey);
+  
+  const genericas = imagenes.filter((i) => !i.colorKey);
+  if (genericas.length > 0) return genericas;
+  
+  return imagenes.length > 0 ? imagenes : [];
 }
 
 export function getColoresFromVariantes<T extends { color?: string | null }>(variantes: T[]): string[] {

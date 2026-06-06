@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
 import { getImagenesFiltradas } from "@/lib/colors";
@@ -21,6 +21,11 @@ export function ProductoDetalleView({ producto }: Props) {
     () => getImagenesFiltradas(producto.imagenes, selectedColor),
     [producto.imagenes, selectedColor]
   );
+
+  // Resetear el índice de la imagen cuando cambia el color para evitar out-of-bounds
+  useEffect(() => {
+    setSelectedThumb(0);
+  }, [selectedColor]);
 
   const totalStock = producto.variantes.reduce((sum, v) => sum + v.stock, 0);
   const isAgotado = totalStock === 0;
