@@ -130,20 +130,19 @@ export function StoreHeader() {
       </header>
 
       {/* Mobile menu overlay & sidebar */}
-      {menuOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end md:hidden">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
-            style={{ animation: "fadeInBlur 0.3s ease-out forwards" }}
-            onClick={() => setMenuOpen(false)}
-          />
+      <div 
+        className={`fixed inset-0 z-50 flex justify-end md:hidden ${menuOpen ? "pointer-events-auto" : "pointer-events-none"}`}
+      >
+        {/* Backdrop */}
+        <div
+          className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${menuOpen ? "opacity-100" : "opacity-0"}`}
+          onClick={() => setMenuOpen(false)}
+        />
 
-          {/* Sidebar */}
-          <div
-            className="relative w-[85vw] max-w-sm h-full bg-bg-secondary border-l border-border-subtle shadow-2xl flex flex-col"
-            style={{ animation: "slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards" }}
-          >
+        {/* Sidebar */}
+        <div
+          className={`relative w-[85vw] max-w-sm h-full bg-bg-secondary border-l border-border-subtle shadow-2xl flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${menuOpen ? "translate-x-0" : "translate-x-full"}`}
+        >
             <div className="flex items-center justify-between h-16 px-6 border-b border-border-subtle shrink-0">
               <span className="font-display tracking-widest text-lg text-text-primary">MENÚ</span>
               <button
@@ -202,7 +201,7 @@ export function StoreHeader() {
             </div>
           </div>
         </div>
-      )}
+      </div>
     </>
   );
 }
