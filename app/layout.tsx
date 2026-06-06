@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ToastContainer } from "@/components/shared/Toast";
 
+const baseUrl = process.env.NEXTAUTH_URL
+  || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
 export const metadata: Metadata = {
+  metadataBase: new URL(baseUrl),
   title: "NOVASK — Zapatillas",
   description: "Tienda online de zapatillas. Estilo urbano con las mejores marcas.",
   icons: {
