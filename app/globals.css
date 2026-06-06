@@ -138,3 +138,12 @@ body {
 @utility animate-pulse-glow-ring {
   animation: pulse-glow-ring 3s ease-in-out infinite;
 }
+
+@keyframes promo-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.3; transform: scale(0.7); }
+}
+
+.promo-pulse-dot {
+  animation: promo-pulse 1.5s ease-in-out infinite;
+}

@@ -100,3 +100,11 @@
 - [ ] Empty states en admin
 - [ ] Cart drawer para mobile
 - [ ] Testing (unitario + e2e)
+
+## Fase 12: Promo Banner 2×1 ✅
+- [x] Banner de promoción 2×1 con countdown de 16 horas
+- [x] Hook usePromoCountdown con persistencia en localStorage
+- [x] PromoBanner component en store layout (entre navbar y contenido)
+- [x] Precio anterior (precioAntes) ahora es claramente opcional en formulario admin
+- [x] Badge de descuento solo aparece cuando precioAntes > precio
+- [x] Badges de ProductCard con w-fit para no estirarse

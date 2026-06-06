@@ -163,10 +163,18 @@ export function ProductoForm({ categorias, marcas, initialData }: Props) {
             {...register("precio", { valueAsNumber: true })}
           />
           <Input
-            label="Precio anterior (S/)"
+            label="Precio anterior (S/) — opcional"
             type="number"
             step="0.01"
-            {...register("precioAntes", { valueAsNumber: true })}
+            placeholder="Dejar vacío si no hay descuento"
+            error={errors.precioAntes?.message}
+            {...register("precioAntes", {
+              setValueAs: (v: string) => {
+                if (v === "" || v === undefined || v === null) return undefined;
+                const n = parseFloat(v);
+                return isNaN(n) ? undefined : n;
+              },
+            })}
           />
         </div>
 

@@ -29,7 +29,7 @@ export function ProductoDetalleView({ producto }: Props) {
 
   const totalStock = producto.variantes.reduce((sum, v) => sum + v.stock, 0);
   const isAgotado = totalStock === 0;
-  const tieneOferta = !!producto.precioAntes;
+  const tieneOferta = !!producto.precioAntes && producto.precioAntes > producto.precio;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -45,7 +45,7 @@ export function ProductCard({ producto, colorFilter }: ProductCardProps) {
   const totalStock = producto.variantes.reduce((sum, v) => sum + v.stock, 0);
   const isAgotado = totalStock === 0;
   const stockBajo = totalStock > 0 && totalStock <= 5;
-  const tieneOferta = !!producto.precioAntes;
+  const tieneOferta = !!producto.precioAntes && Number(producto.precioAntes) > Number(producto.precio);
   const pctOferta = tieneOferta
     ? Math.round((1 - Number(producto.precio) / Number(producto.precioAntes)) * 100)
     : 0;
@@ -74,24 +74,24 @@ export function ProductCard({ producto, colorFilter }: ProductCardProps) {
         )}
 
         {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+        <div className="absolute top-3 left-3 flex flex-col items-start gap-1.5">
           {isNew && (
-            <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-[0.1em] bg-accent-primary text-black">
+            <span className="w-fit px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-[0.1em] bg-accent-primary text-black">
               NEW DROP
             </span>
           )}
-          {tieneOferta && (
-            <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-[0.1em] bg-accent-secondary text-white">
+          {tieneOferta && pctOferta > 0 && (
+            <span className="w-fit px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-[0.1em] bg-accent-secondary text-white">
               -{pctOferta}%
             </span>
           )}
           {isAgotado && (
-            <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-[0.1em] bg-accent-secondary/20 text-accent-secondary border border-accent-secondary/30">
+            <span className="w-fit px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-[0.1em] bg-accent-secondary/20 text-accent-secondary border border-accent-secondary/30">
               AGOTADO
             </span>
           )}
           {stockBajo && !isAgotado && (
-            <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-[0.1em] bg-accent-secondary/20 text-accent-secondary border border-accent-secondary/30 animate-pulse-stock">
+            <span className="w-fit px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-[0.1em] bg-accent-secondary/20 text-accent-secondary border border-accent-secondary/30 animate-pulse-stock">
               ÚLTIMAS UNIDADES
             </span>
           )}

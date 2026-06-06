@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { StoreHeader } from "@/components/store/Header";
 import { StoreFooter } from "@/components/store/Footer";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
+import { PromoBanner } from "@/components/store/PromoBanner";
 import { getWhatsAppNumber } from "@/lib/whatsapp";
 
 export const metadata: Metadata = {
@@ -24,6 +25,7 @@ export default async function StoreLayout({
   return (
     <>
       <StoreHeader />
+      <PromoBanner />
       <main className="flex-1">{children}</main>
       <StoreFooter />
       <WhatsAppButton phoneNumber={phoneNumber} />

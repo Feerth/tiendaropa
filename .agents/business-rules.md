@@ -60,3 +60,10 @@
 - Tamaño máximo: 5MB por imagen
 - Cloudinary como único proveedor de imágenes
 - Validación MIME en servidor antes de subir
+
+## Promo 2×1
+- Cliente lleva 2 pares de cualquier modelo por S/ 149.90
+- El timer es de 16 horas y se reinicia automáticamente (siempre activo)
+- Persistencia en localStorage para que no se reinicie al recargar la página
+- Banner permanente entre navbar y contenido en todas las páginas de tienda
+- Primera versión: el cliente indica los 2 pares en notas del checkout
