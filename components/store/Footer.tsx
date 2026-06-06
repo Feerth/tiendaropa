@@ -38,7 +38,7 @@ export function StoreFooter() {
               Envíos a todo Perú con las mejores marcas.
             </p>
             <div className="flex items-center gap-3">
-              <a href="https://instagram.com/novask.pe" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-bg-elevated flex items-center justify-center text-text-secondary hover:text-accent-primary hover:bg-accent-primary/10 transition-all duration-200" aria-label="Instagram">
+              <a href="https://www.instagram.com/nov4sk_" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-bg-elevated flex items-center justify-center text-text-secondary hover:text-accent-primary hover:bg-accent-primary/10 transition-all duration-200" aria-label="Instagram">
                 <InstagramIcon />
               </a>
               <a href="https://tiktok.com/@novask.pe" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-bg-elevated flex items-center justify-center text-text-secondary hover:text-accent-primary hover:bg-accent-primary/10 transition-all duration-200" aria-label="TikTok">
@@ -106,7 +106,7 @@ export function StoreFooter() {
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent-primary/60" />
-                IG: @novask.pe
+                IG: @nov4sk_
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent-primary/60" />
