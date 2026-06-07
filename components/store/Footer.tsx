@@ -104,10 +104,7 @@ export function StoreFooter() {
                 <span className="w-1.5 h-1.5 rounded-full bg-accent-primary/60" />
                 Instagram: @nov4sk_
               </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-accent-primary/60" />
-                IG: @nov4sk_
-              </li>
+
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent-primary/60" />
                 Envío rápido a todo el Perú
