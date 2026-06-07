@@ -10,9 +10,11 @@ import { formatPrice, getWhatsAppUrl, generateWhatsAppMessage } from "@/lib/util
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "51931869696";
 
 export default function CarritoPage() {
-  const { items, removeItem, updateQuantity, getTotal, clearCart } = useCartStore();
+  const { items, removeItem, updateQuantity, getTotal, getSubtotal, getDescuento, clearCart } = useCartStore();
   const [checkoutDone, setCheckoutDone] = useState(false);
   const total = getTotal();
+  const subtotal = getSubtotal();
+  const descuento = getDescuento();
 
   const handleWhatsAppCheckout = () => {
     const message = generateWhatsAppMessage(
@@ -22,7 +24,9 @@ export default function CarritoPage() {
         cantidad: item.cantidad,
         precio: item.precio,
       })),
-      total
+      total,
+      undefined,
+      descuento
     );
     window.open(getWhatsAppUrl(WHATSAPP_NUMBER, message), "_blank");
     setCheckoutDone(true);
@@ -119,9 +123,31 @@ export default function CarritoPage() {
       </div>
 
       <div className="bg-bg-card rounded-xl border border-border-subtle p-6">
+        <div className="flex flex-col gap-2 mb-6 border-b border-[#222222] pb-4">
+          <div className="flex items-center justify-between">
+            <span className="text-text-secondary text-sm">Subtotal</span>
+            <span className="font-mono text-text-primary text-sm">
+              {formatPrice(subtotal)}
+            </span>
+          </div>
+          {descuento > 0 && (
+            <div className="flex items-center justify-between text-[#E8FF00]">
+              <span className="flex items-center gap-2 text-sm">
+                Descuento 2×1
+                <span className="bg-[#E8FF00] text-black px-1.5 py-0.5 rounded text-[10px] font-bold uppercase leading-none">
+                  Aplicado
+                </span>
+              </span>
+              <span className="font-mono font-bold text-sm">
+                -{formatPrice(descuento)}
+              </span>
+            </div>
+          )}
+        </div>
+
         <div className="flex items-center justify-between mb-6">
           <span className="text-text-secondary">Total</span>
-          <span className="font-mono text-2xl font-bold text-accent-primary">
+          <span className="font-mono text-2xl font-bold text-[#E8FF00]">
             {formatPrice(total)}
           </span>
         </div>

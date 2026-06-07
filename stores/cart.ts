@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { CartItem } from "@/types";
+import { calcularTotalConPromo } from "@/lib/promo";
 
 type CartStore = {
   items: CartItem[];
@@ -9,6 +10,8 @@ type CartStore = {
   updateQuantity: (varianteId: string, cantidad: number) => void;
   clearCart: () => void;
   getTotal: () => number;
+  getSubtotal: () => number;
+  getDescuento: () => number;
   getItemsCount: () => number;
 };
 
@@ -56,10 +59,15 @@ export const useCartStore = create<CartStore>()(
       clearCart: () => set({ items: [] }),
 
       getTotal: () => {
-        return get().items.reduce(
-          (sum, item) => sum + item.precio * item.cantidad,
-          0
-        );
+        return calcularTotalConPromo(get().items).total;
+      },
+
+      getSubtotal: () => {
+        return calcularTotalConPromo(get().items).subtotal;
+      },
+
+      getDescuento: () => {
+        return calcularTotalConPromo(get().items).descuento;
       },
 
       getItemsCount: () => {

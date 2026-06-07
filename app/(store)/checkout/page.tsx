@@ -11,8 +11,10 @@ import { formatPrice } from "@/lib/utils";
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, getTotal, clearCart } = useCartStore();
+  const { items, getTotal, getSubtotal, getDescuento, clearCart } = useCartStore();
   const total = getTotal();
+  const subtotal = getSubtotal();
+  const descuento = getDescuento();
 
   const [form, setForm] = useState({
     nombreCliente: "",
@@ -225,14 +227,25 @@ export default function CheckoutPage() {
               ))}
             </div>
 
-            <div className="border-t border-border-subtle pt-4 space-y-2">
+            <div className="border-t border-[#222222] pt-4 space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-text-muted">Subtotal</span>
-                <span className="text-text-primary">{formatPrice(total)}</span>
+                <span className="text-text-secondary">Subtotal</span>
+                <span className="text-text-primary">{formatPrice(subtotal)}</span>
               </div>
-              <div className="flex justify-between text-lg font-bold">
+              {descuento > 0 && (
+                <div className="flex justify-between text-sm text-[#E8FF00]">
+                  <span className="flex items-center gap-2">
+                    Descuento 2×1
+                    <span className="bg-[#E8FF00] text-black px-1 py-0.5 rounded text-[10px] font-bold uppercase leading-none">
+                      Aplicado
+                    </span>
+                  </span>
+                  <span className="font-bold">-{formatPrice(descuento)}</span>
+                </div>
+              )}
+              <div className="flex justify-between text-lg font-bold border-t border-[#222222] mt-2 pt-2">
                 <span className="text-text-primary">Total</span>
-                <span className="font-mono text-accent-primary">{formatPrice(total)}</span>
+                <span className="font-mono text-[#E8FF00]">{formatPrice(total)}</span>
               </div>
             </div>
 

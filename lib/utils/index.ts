@@ -29,7 +29,8 @@ export function formatDate(date: Date): string {
 export function generateWhatsAppMessage(
   items: { nombre: string; talla: string; cantidad: number; precio: number }[],
   total: number,
-  nombreCliente?: string
+  nombreCliente?: string,
+  descuento: number = 0
 ): string {
   let message = "¡Hola! Quiero hacer el siguiente pedido:\n\n";
 
@@ -39,6 +40,10 @@ export function generateWhatsAppMessage(
       : "0.00";
     message += `${i + 1}. ${item.nombre} - Talla: ${item.talla} x${item.cantidad} = S/ ${subtotal}\n`;
   });
+
+  if (descuento > 0) {
+    message += `\nDescuento 2×1: -S/ ${descuento.toFixed(2)}`;
+  }
 
   const totalStr = Number.isFinite(total) ? total.toFixed(2) : "0.00";
   message += `\nTotal: S/ ${totalStr}`;

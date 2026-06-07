@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { checkoutSchema } from "@/lib/validations/checkout.schema";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { sanitize } from "@/lib/sanitize";
+import { calcularTotalConPromo } from "@/lib/promo";
 
 export async function POST(request: Request) {
   try {
@@ -94,9 +95,11 @@ export async function POST(request: Request) {
       };
     });
 
-    const total = itemsConPrecio.reduce(
-      (sum, item) => sum + item.precioUnit * item.cantidad,
-      0
+    const { total } = calcularTotalConPromo(
+      itemsConPrecio.map((item) => ({
+        precio: item.precioUnit,
+        cantidad: item.cantidad,
+      }))
     );
 
     const pedido = await prisma.$transaction(async (tx) => {
