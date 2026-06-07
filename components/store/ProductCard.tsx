@@ -80,11 +80,7 @@ export function ProductCard({ producto, colorFilter }: ProductCardProps) {
               NEW DROP
             </span>
           )}
-          {tieneOferta && pctOferta > 0 && (
-            <span className="w-fit px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-[0.1em] bg-accent-secondary text-white">
-              -{pctOferta}%
-            </span>
-          )}
+
           {isAgotado && (
             <span className="w-fit px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-[0.1em] bg-accent-secondary/20 text-accent-secondary border border-accent-secondary/30">
               AGOTADO

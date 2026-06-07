@@ -54,7 +54,6 @@ export function ProductoDetalleView({ producto }: Props) {
             )}
 
             <div className="absolute top-4 left-4 flex flex-col gap-2">
-              {tieneOferta && <Badge variant="oferta">OFERTA</Badge>}
               {isAgotado && <Badge variant="agotado">AGOTADO</Badge>}
             </div>
           </div>
