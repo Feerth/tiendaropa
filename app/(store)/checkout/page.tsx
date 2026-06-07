@@ -164,7 +164,7 @@ export default function CheckoutPage() {
               onChange={(e) => handleChange("telefono", e.target.value)}
               placeholder="Ej: 999888777"
               error={errors.telefono}
-              helperText="Válido para contacto y WhatsApp"
+              helperText="Válido para contacto"
               required
             />
 

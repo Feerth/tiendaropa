@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { StoreHeader } from "@/components/store/Header";
 import { StoreFooter } from "@/components/store/Footer";
-import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
+import { InstagramButton } from "@/components/shared/InstagramButton";
 import { PromoBanner } from "@/components/store/PromoBanner";
-import { getWhatsAppNumber } from "@/lib/whatsapp";
+import { getInstagramUsername } from "@/lib/instagram";
 
 export const metadata: Metadata = {
   title: "NOVASK — Zapatillas",
@@ -20,7 +20,7 @@ export default async function StoreLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const phoneNumber = await getWhatsAppNumber();
+  const igUsername = await getInstagramUsername();
 
   return (
     <>
@@ -28,7 +28,7 @@ export default async function StoreLayout({
       <PromoBanner />
       <main className="flex-1">{children}</main>
       <StoreFooter />
-      <WhatsAppButton phoneNumber={phoneNumber} />
+      <InstagramButton username={igUsername} />
     </>
   );
 }

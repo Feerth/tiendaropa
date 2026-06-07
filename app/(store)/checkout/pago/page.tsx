@@ -6,8 +6,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/shared/Button";
 import { formatPrice } from "@/lib/utils";
+import { InstagramMessageModal } from "@/components/shared/InstagramMessageModal";
 
-const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "51931869696";
+const INSTAGRAM_USERNAME = process.env.NEXT_PUBLIC_INSTAGRAM_USERNAME || "nov4sk_";
 
 function PagoContent() {
   const searchParams = useSearchParams();
@@ -16,9 +17,11 @@ function PagoContent() {
   const total = searchParams.get("total");
 
   const [qrUrl, setQrUrl] = useState<string | null>(null);
-  const [whatsappNumber, setWhatsappNumber] = useState(WHATSAPP_NUMBER);
+  const [igUsername, setIgUsername] = useState(INSTAGRAM_USERNAME);
   const [copied, setCopied] = useState(false);
   const [notified, setNotified] = useState(false);
+  const [showIgModal, setShowIgModal] = useState(false);
+  const [igMessage, setIgMessage] = useState("");
 
   useEffect(() => {
     fetch("/api/configuracion-publica")
@@ -26,7 +29,7 @@ function PagoContent() {
       .then((res) => {
         if (res.success) {
           if (res.data.qr_imagen_url) setQrUrl(res.data.qr_imagen_url);
-          if (res.data.whatsapp_numero) setWhatsappNumber(res.data.whatsapp_numero);
+          if (res.data.instagram_usuario) setIgUsername(res.data.instagram_usuario);
         }
       })
       .catch(() => {});
@@ -47,14 +50,10 @@ function PagoContent() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleWhatsApp = () => {
-    const message = encodeURIComponent(
-      `¡Hola! Ya realicé el pago del pedido #${numero} por S/ ${parseFloat(total || "0").toFixed(2)}. Por favor confírmalo.`
-    );
-    window.open(
-      `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, "")}?text=${message}`,
-      "_blank"
-    );
+  const handleInstagram = () => {
+    const message = `¡Hola! Ya realicé el pago del pedido #${numero} por S/ ${parseFloat(total || "0").toFixed(2)}. Por favor confírmalo.`;
+    setIgMessage(message);
+    setShowIgModal(true);
 
     if (id) {
       fetch(`/api/pedidos/${id}/notificar-pago`, {
@@ -105,7 +104,7 @@ function PagoContent() {
                 <p className="text-xs text-text-muted text-center px-4">
                   QR no configurado
                   <br />
-                  <span className="text-[10px]">Paga por WhatsApp directo</span>
+                  <span className="text-[10px]">Contáctanos por Instagram</span>
                 </p>
               </div>
             </div>
@@ -133,10 +132,10 @@ function PagoContent() {
           <Button
             size="lg"
             className="w-full"
-            onClick={handleWhatsApp}
+            onClick={handleInstagram}
             disabled={notified}
           >
-            {notified ? "✓ AVISADO — ESPERANDO CONFIRMACIÓN" : "✓ YA PAGUÉ — AVISAR POR WHATSAPP"}
+            {notified ? "✓ AVISADO — ESPERANDO CONFIRMACIÓN" : "✓ YA PAGUÉ — AVISAR POR INSTAGRAM"}
           </Button>
 
           <p className="text-xs text-text-muted">
@@ -151,6 +150,13 @@ function PagoContent() {
           Ver estado de mi pedido →
         </Link>
       </div>
+
+      <InstagramMessageModal
+        isOpen={showIgModal}
+        onClose={() => setShowIgModal(false)}
+        message={igMessage}
+        igUsername={igUsername}
+      />
     </div>
   );
 }

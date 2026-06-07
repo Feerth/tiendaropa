@@ -44,7 +44,7 @@ export default function CambiosPage() {
           <p className="text-text-secondary text-sm leading-relaxed">
             Si recibiste un producto en mal estado o con algún defecto de fábrica, 
             o si te enviamos un producto o talla incorrecta, 
-            escríbenos inmediatamente por WhatsApp.
+            escríbenos inmediatamente por Instagram.
           </p>
           <ul className="mt-3 space-y-1.5 text-sm text-text-secondary">
             <li className="flex items-start gap-2">
@@ -73,7 +73,7 @@ export default function CambiosPage() {
         <section className="bg-bg-card border border-border-subtle rounded-xl p-6">
           <h2 className="font-display text-2xl text-text-primary mb-3">Proceso de cambio</h2>
           <ol className="space-y-2 text-sm text-text-secondary list-decimal list-inside">
-            <li>Contáctanos por WhatsApp indicando tu número de pedido y el motivo del cambio.</li>
+            <li>Contáctanos por Instagram indicando tu número de pedido y el motivo del cambio.</li>
             <li>Te indicaremos la dirección de envío y los pasos a seguir.</li>
             <li>Envía el producto con su empaque original y etiquetas.</li>
             <li>Una vez recibido y revisado, gestionamos tu cambio en 2-3 días hábiles.</li>
@@ -86,7 +86,7 @@ export default function CambiosPage() {
           href="/contacto"
           className="inline-block px-8 py-3 bg-accent-primary text-black font-bold rounded-lg hover:brightness-110 transition-all font-display tracking-wider"
         >
-          CONTACTAR POR WHATSAPP
+          CONTACTAR POR INSTAGRAM
         </Link>
       </div>
     </div>

@@ -144,17 +144,17 @@ export default function ConfiguracionPage() {
         </div>
       </section>
 
-      {/* WhatsApp */}
+      {/* Instagram */}
       <section className="bg-bg-card border border-border-subtle rounded-xl p-6 space-y-4">
-        <h2 className="font-display text-lg text-text-primary">WhatsApp</h2>
+        <h2 className="font-display text-lg text-text-primary">Instagram</h2>
         <Input
-          label="Número de WhatsApp"
-          value={config.whatsapp_numero ?? ""}
+          label="Usuario de Instagram"
+          value={config.instagram_usuario ?? ""}
           onChange={(e) =>
-            setConfig((prev) => ({ ...prev, whatsapp_numero: e.target.value }))
+            setConfig((prev) => ({ ...prev, instagram_usuario: e.target.value }))
           }
-          placeholder="51931869696"
-          helperText="Código de país + número, sin + ni espacios"
+          placeholder="nov4sk_"
+          helperText="Sin @ — solo el nombre de usuario"
         />
       </section>
 

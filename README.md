@@ -34,7 +34,7 @@ Variables requeridas:
 - `NEXTAUTH_URL` — URL base (`http://localhost:3000` en dev)
 - `NEXTAUTH_SECRET` — Generar con: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
 - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
-- `NEXT_PUBLIC_WHATSAPP_NUMBER` — Número de WhatsApp (ej: `51931869696`)
+- `NEXT_PUBLIC_INSTAGRAM_USERNAME` — Usuario de Instagram (ej: `nov4sk_`)
 
 ### 3. Configurar base de datos
 

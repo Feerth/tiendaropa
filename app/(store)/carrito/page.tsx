@@ -5,19 +5,22 @@ import Link from "next/link";
 import { useState } from "react";
 import { useCartStore } from "@/stores/cart";
 import { Button } from "@/components/shared/Button";
-import { formatPrice, getWhatsAppUrl, generateWhatsAppMessage } from "@/lib/utils";
+import { formatPrice, generateInstagramMessage } from "@/lib/utils";
+import { InstagramMessageModal } from "@/components/shared/InstagramMessageModal";
 
-const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "51931869696";
+const INSTAGRAM_USERNAME = process.env.NEXT_PUBLIC_INSTAGRAM_USERNAME || "nov4sk_";
 
 export default function CarritoPage() {
   const { items, removeItem, updateQuantity, getTotal, getSubtotal, getDescuento, clearCart } = useCartStore();
   const [checkoutDone, setCheckoutDone] = useState(false);
+  const [showIgModal, setShowIgModal] = useState(false);
+  const [igMessage, setIgMessage] = useState("");
   const total = getTotal();
   const subtotal = getSubtotal();
   const descuento = getDescuento();
 
-  const handleWhatsAppCheckout = () => {
-    const message = generateWhatsAppMessage(
+  const handleInstagramCheckout = () => {
+    const message = generateInstagramMessage(
       items.map((item) => ({
         nombre: item.nombre,
         talla: item.talla,
@@ -28,8 +31,8 @@ export default function CarritoPage() {
       undefined,
       descuento
     );
-    window.open(getWhatsAppUrl(WHATSAPP_NUMBER, message), "_blank");
-    setCheckoutDone(true);
+    setIgMessage(message);
+    setShowIgModal(true);
   };
 
   const handleClearCart = () => {
@@ -155,21 +158,13 @@ export default function CarritoPage() {
         <Button
           size="lg"
           className="w-full"
-          onClick={handleWhatsAppCheckout}
+          onClick={handleInstagramCheckout}
         >
-          FINALIZAR PEDIDO POR WHATSAPP
+          FINALIZAR PEDIDO POR INSTAGRAM
         </Button>
 
-        {checkoutDone && (
-          <div className="mt-3 space-y-2">
-            <p className="text-xs text-accent-tertiary text-center">
-              ✅ Pedido enviado a WhatsApp
-            </p>
-          </div>
-        )}
-
         <p className="text-xs text-text-muted text-center mt-3">
-          Recibirás un resumen detallado de tu pedido en WhatsApp.
+          Se abrirá un mensaje para enviar a nuestra cuenta de Instagram.
         </p>
 
         <button
@@ -179,6 +174,13 @@ export default function CarritoPage() {
           Vaciar carrito
         </button>
       </div>
+
+      <InstagramMessageModal
+        isOpen={showIgModal}
+        onClose={() => setShowIgModal(false)}
+        message={igMessage}
+        igUsername={INSTAGRAM_USERNAME}
+      />
     </div>
   );
 }

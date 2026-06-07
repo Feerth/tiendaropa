@@ -102,7 +102,7 @@ export function StoreFooter() {
             <ul className="space-y-3 text-sm text-text-secondary">
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent-primary/60" />
-                WhatsApp: +51 931 869 696
+                Instagram: @nov4sk_
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent-primary/60" />

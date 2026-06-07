@@ -4,7 +4,8 @@ import { useState, useMemo } from "react";
 import { colorToHex, getColoresFromVariantes } from "@/lib/colors";
 import { Button } from "@/components/shared/Button";
 import { useCartStore } from "@/stores/cart";
-import { getWhatsAppUrl, formatPrice } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
+import { InstagramMessageModal } from "@/components/shared/InstagramMessageModal";
 
 interface VarianteInfo {
   id: string;
@@ -24,11 +25,13 @@ interface Props {
   onColorChange: (color: string | null) => void;
 }
 
-const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "51931869696";
+const INSTAGRAM_USERNAME = process.env.NEXT_PUBLIC_INSTAGRAM_USERNAME || "nov4sk_";
 
 export function ProductoDetalleClient({ productoId, nombre, imagen, precio, variantes, selectedColor, onColorChange }: Props) {
   const [selectedTalla, setSelectedTalla] = useState<string | null>(null);
   const [cantidad, setCantidad] = useState(1);
+  const [showIgModal, setShowIgModal] = useState(false);
+  const [igMessage, setIgMessage] = useState("");
   const addItem = useCartStore((s) => s.addItem);
 
   const coloresDisponibles = useMemo(
@@ -75,13 +78,13 @@ export function ProductoDetalleClient({ productoId, nombre, imagen, precio, vari
     });
   };
 
-  const handleWhatsAppConsult = () => {
+  const handleInstagramConsult = () => {
     const talla = selectedTalla || (sinVariante ? "Única" : "");
     const color = selectedColor || "";
     const link = typeof window !== "undefined" ? window.location.href : "";
     const msg = `¡Hola! Quiero consultar sobre: ${nombre}${color ? ` - Color: ${color}` : ""}${talla ? ` - Talla: ${talla}` : ""} (S/ ${Number.isFinite(precio) ? precio.toFixed(2) : "0.00"})\n${link}`;
-    const encoded = encodeURIComponent(msg);
-    window.open(getWhatsAppUrl(WHATSAPP_NUMBER, encoded), "_blank");
+    setIgMessage(msg);
+    setShowIgModal(true);
   };
 
   const isPrecioValido = Number.isFinite(precio);
@@ -220,12 +223,19 @@ export function ProductoDetalleClient({ productoId, nombre, imagen, precio, vari
         <Button
           variant="secondary"
           size="lg"
-          onClick={handleWhatsAppConsult}
+          onClick={handleInstagramConsult}
           className="flex-1"
         >
-          CONSULTAR POR WhatsApp
+          CONSULTAR POR INSTAGRAM
         </Button>
       </div>
+
+      <InstagramMessageModal
+        isOpen={showIgModal}
+        onClose={() => setShowIgModal(false)}
+        message={igMessage}
+        igUsername={INSTAGRAM_USERNAME}
+      />
     </div>
   );
 }

@@ -42,10 +42,11 @@
 - El admin se crea vía seed con email y contraseña hasheada (bcrypt 12 rounds)
 - Rate limiting en login: 5 intentos / 15 min por IP
 
-## WhatsApp
-- Número configurable via NEXT_PUBLIC_WHATSAPP_NUMBER y desde panel admin (Configuración)
-- Formato: código de país + número, sin + ni espacios (ej: 51931869696)
+## Instagram
+- Usuario configurable via NEXT_PUBLIC_INSTAGRAM_USERNAME y desde panel admin (Configuración)
+- Formato: nombre de usuario sin @ (ej: nov4sk_)
 - Botón flotante visible en TODAS las páginas públicas
+- Al enviar pedido/consulta: se copia el mensaje al portapapeles y se abre el DM de Instagram
 - Mensaje de carrito incluye: producto, talla, cantidad, precio unitario, subtotal, total
 - Mensaje de pago incluye: número de pedido, monto, solicitud de confirmación
 
@@ -53,7 +54,7 @@
 - La imagen QR se administra desde Admin → Configuración
 - Se guarda en Cloudinary y URL en tabla Configuracion con clave "qr_imagen_url"
 - La página /checkout/pago carga el QR dinámicamente
-- Si no hay QR configurado, se muestra mensaje de pago por WhatsApp directo
+- Si no hay QR configurado, se muestra mensaje de contacto por Instagram
 
 ## Imágenes
 - Solo se permiten JPEG, PNG y WebP (validado por magic bytes, no por extensión)

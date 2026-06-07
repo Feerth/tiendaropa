@@ -26,7 +26,7 @@ export function formatDate(date: Date): string {
   }).format(new Date(date));
 }
 
-export function generateWhatsAppMessage(
+export function generateInstagramMessage(
   items: { nombre: string; talla: string; cantidad: number; precio: number }[],
   total: number,
   nombreCliente?: string,
@@ -52,10 +52,10 @@ export function generateWhatsAppMessage(
     message += `\nCliente: ${nombreCliente}`;
   }
 
-  return encodeURIComponent(message);
+  return message;
 }
 
-export function getWhatsAppUrl(phone: string, message: string): string {
-  const cleaned = phone.replace(/[^0-9]/g, "");
-  return `https://wa.me/${cleaned}?text=${message}`;
+export function getInstagramDMUrl(username: string): string {
+  const cleaned = username.replace(/^@/, "");
+  return `https://ig.me/m/${cleaned}`;
 }

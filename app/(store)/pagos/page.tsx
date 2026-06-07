@@ -36,7 +36,7 @@ export default function PagosPage() {
         <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
           <h2 className="font-display text-2xl text-accent-primary mb-3">Transferencia bancaria</h2>
           <p className="text-text-secondary text-sm leading-relaxed">
-            Si prefieres transferencia, contáctanos por WhatsApp y te enviamos 
+            Si prefieres transferencia, contáctanos por Instagram y te enviamos 
             nuestros datos bancarios (BCP, Interbank, BBVA).
           </p>
         </div>
@@ -47,7 +47,7 @@ export default function PagosPage() {
         <ul className="space-y-2 text-sm text-text-secondary">
           <li className="flex items-start gap-2">
             <span className="text-accent-primary mt-0.5">•</span>
-            Una vez realizado el pago, presiona el botón &quot;YA PAGUÉ — AVISAR POR WHATSAPP&quot; para notificarnos.
+            Una vez realizado el pago, presiona el botón &quot;YA PAGUÉ — AVISAR POR INSTAGRAM&quot; para notificarnos.
           </li>
           <li className="flex items-start gap-2">
             <span className="text-accent-primary mt-0.5">•</span>
@@ -55,7 +55,7 @@ export default function PagosPage() {
           </li>
           <li className="flex items-start gap-2">
             <span className="text-accent-primary mt-0.5">•</span>
-            Si tienes dudas, escríbenos por WhatsApp antes de pagar.
+            Si tienes dudas, escríbenos por Instagram antes de pagar.
           </li>
         </ul>
       </div>

@@ -3,15 +3,15 @@ import { Button } from "@/components/shared/Button";
 
 export const metadata: Metadata = {
   title: "Contacto — NOVASK",
-  description: "Contáctanos por WhatsApp. Consulta por productos, tallas, disponibilidad y más. Te atendemos al instante.",
+  description: "Contáctanos por Instagram. Consulta por productos, tallas, disponibilidad y más. Te atendemos al instante.",
   openGraph: {
     title: "Contacto — NOVASK",
-    description: "Contáctanos por WhatsApp.",
+    description: "Contáctanos por Instagram.",
     type: "website",
   },
 };
 
-const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "51931869696";
+const INSTAGRAM_USERNAME = process.env.NEXT_PUBLIC_INSTAGRAM_USERNAME || "nov4sk_";
 
 export default function ContactoPage() {
   return (
@@ -20,18 +20,18 @@ export default function ContactoPage() {
         CONTACTO
       </h1>
       <p className="text-text-secondary text-lg mb-8 max-w-md mx-auto leading-relaxed">
-        Escríbenos por WhatsApp y te atenderemos al instante. 
+        Escríbenos por Instagram y te atenderemos al instante. 
         Consulta por productos, tallas, disponibilidad y más.
       </p>
 
       <div className="space-y-4">
         <a
-          href={`https://wa.me/${WHATSAPP_NUMBER}`}
+          href={`https://ig.me/m/${INSTAGRAM_USERNAME.replace(/^@/, "")}`}
           target="_blank"
           rel="noopener noreferrer"
         >
           <Button size="lg" className="w-full sm:w-auto">
-            ESCRIBIR POR WHATSAPP
+            ESCRIBIR POR INSTAGRAM
           </Button>
         </a>
 
@@ -39,8 +39,8 @@ export default function ContactoPage() {
           <h2 className="font-display text-xl text-text-primary mb-4">INFORMACIÓN</h2>
           <ul className="space-y-3 text-sm text-text-secondary">
             <li className="flex items-center gap-2">
-              <span className="w-20 text-text-muted shrink-0">WhatsApp:</span>
-              <span>+51 931 869 696</span>
+              <span className="w-20 text-text-muted shrink-0">Instagram:</span>
+              <span>@{INSTAGRAM_USERNAME.replace(/^@/, "")}</span>
             </li>
             <li className="flex items-center gap-2">
               <span className="w-20 text-text-muted shrink-0">Horario:</span>
