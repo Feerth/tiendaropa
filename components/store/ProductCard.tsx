@@ -104,11 +104,6 @@ export function ProductCard({ producto, colorFilter }: ProductCardProps) {
           <span className="font-mono text-lg font-bold text-accent-primary">
             {formatPrice(Number(producto.precio))}
           </span>
-          {tieneOferta && (
-            <span className="font-mono text-xs text-text-muted line-through">
-              {formatPrice(Number(producto.precioAntes))}
-            </span>
-          )}
         </div>
 
         {/* Name + Category */}

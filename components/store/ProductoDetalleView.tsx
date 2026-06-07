@@ -96,11 +96,6 @@ export function ProductoDetalleView({ producto }: Props) {
             <span className="font-mono text-3xl font-bold text-accent-primary">
               {formatPrice(producto.precio)}
             </span>
-            {tieneOferta && (
-              <span className="font-mono text-lg text-text-muted line-through">
-                {formatPrice(producto.precioAntes!)}
-              </span>
-            )}
           </div>
 
           {isAgotado ? (
