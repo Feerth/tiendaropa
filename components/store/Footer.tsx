@@ -34,7 +34,7 @@ export function StoreFooter() {
               className="h-16 w-auto mb-4"
             />
             <p className="text-sm text-text-secondary leading-relaxed mb-6">
-              Tienda online de zapatillas originales. 
+              Tienda online de zapatillas. 
               Envíos a todo Perú con las mejores marcas.
             </p>
             <div className="flex items-center gap-3">

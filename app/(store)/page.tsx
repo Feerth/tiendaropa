@@ -72,11 +72,11 @@ async function getNuevos() {
 }
 
 export const metadata: Metadata = {
-  title: "NOVASK — Zapatillas Originales",
-  description: "Tienda online de zapatillas originales. Estilo urbano con las mejores marcas. Envíos a todo Perú.",
+  title: "NOVASK — Zapatillas",
+  description: "Tienda online de zapatillas. Estilo urbano con las mejores marcas. Envíos a todo Perú.",
   openGraph: {
-    title: "NOVASK — Zapatillas Originales",
-    description: "Tienda online de zapatillas originales. Envíos a todo Perú.",
+    title: "NOVASK — Zapatillas",
+    description: "Tienda online de zapatillas. Envíos a todo Perú.",
     type: "website",
   },
 };
